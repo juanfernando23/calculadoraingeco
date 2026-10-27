@@ -1,0 +1,19 @@
+{
+  "name": "Calculadora Financiera",
+  "short_name": "Calculadora",
+  "description": "Calculadora financiera del proyecto de aula de Ingeniería Económica: cada resultado con su fórmula, su procedimiento y su gráfico.",
+  "lang": "es-CO",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f6f7",
+  "theme_color": "#f4f6f7",
+  "categories": ["education", "finance"],
+  "icons": [
+    { "src": "iconos/icono-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "iconos/icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "iconos/icono-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "iconos/icono.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

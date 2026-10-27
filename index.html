@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Calculadora financiera del proyecto de aula de Ingeniería Económica.">
+  <meta name="theme-color" content="#f4f6f7">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Calculadora">
+  <title>Calculadora Financiera</title>
+  <link rel="icon" href="iconos/icono.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="iconos/apple-touch-icon.png">
+  <link rel="stylesheet" href="estilos.css">
+  <script>
+    // Aplica el tema y la preferencia de animaciones antes de pintar, para que no parpadee.
+    (() => {
+      const raiz = document.documentElement;
+      let tema = null;
+      let movimiento = "auto";
+      try {
+        tema = localStorage.getItem("tema");
+        movimiento = localStorage.getItem("movimiento") || "auto";
+      } catch (e) { /* sin almacenamiento: se usan las preferencias del sistema */ }
+      if (tema === "light" || tema === "dark") raiz.dataset.theme = tema;
+      // "auto" sigue al sistema; "siempre" y "reducidas" se eligen en "Acerca de".
+      const sistemaReduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      raiz.dataset.movimiento = movimiento === "reducidas" || (movimiento === "auto" && sistemaReduce) ? "reducido" : "completo";
+      // App instalable: solo cuando está publicada en internet. Abierta con doble clic (file://),
+      // el navegador bloquea el manifiesto y lo muestra como error.
+      if (location.protocol === "https:" || location.protocol === "http:") {
+        const manifiesto = document.createElement("link");
+        manifiesto.rel = "manifest";
+        manifiesto.href = "manifest.webmanifest";
+        document.head.append(manifiesto);
+      }
+    })();
+  </script>
+</head>
+<body>
+  <!-- Íconos de línea -->
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <symbol id="i-atras" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+    <symbol id="i-adelante" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></symbol>
+    <symbol id="i-abajo" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+    <symbol id="i-luna" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></symbol>
+    <symbol id="i-sol" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6L6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></symbol>
+    <symbol id="i-inicio" viewBox="0 0 24 24"><path d="M4 10.5L12 4l8 6.5"/><path d="M6 9v10a1 1 0 0 0 1 1h3.5v-5.5h3V20H17a1 1 0 0 0 1-1V9"/></symbol>
+    <symbol id="i-ayuda" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.9.7c0 1.7-2.5 2.2-2.5 3.7"/><path d="M12 17.2h.01"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><path d="M12 7.6h.01"/></symbol>
+    <symbol id="i-copiar" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M15 9V6.5A2.5 2.5 0 0 0 12.5 4h-6A2.5 2.5 0 0 0 4 6.5v6A2.5 2.5 0 0 0 6.5 15H9"/></symbol>
+    <symbol id="i-listo" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-repetir" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4.5V9h4.5"/></symbol>
+    <symbol id="i-reproducir" viewBox="0 0 24 24"><path d="M8 5.5v13l10-6.5z"/></symbol>
+    <symbol id="i-flecha" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-alerta" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V13"/><path d="M12 16.5h.01"/></symbol>
+    <symbol id="i-flujo" viewBox="0 0 24 24"><path d="M3 12h18"/><path d="M6.5 12v6.5M4.5 16.5l2 2 2-2"/><path d="M17.5 12V5.5M15.5 7.5l2-2 2 2"/></symbol>
+    <symbol id="i-barras" viewBox="0 0 24 24"><path d="M4 19.5h16"/><path d="M7.5 16v-3.5M12 16v-6M16.5 16V7"/></symbol>
+    <symbol id="i-area" viewBox="0 0 24 24"><path d="M4 19.5h16"/><path d="M5 16c4.5 0 8-1.5 10.5-4.5S18.5 7 19.5 6.5V16z" fill="currentColor" fill-opacity=".2"/></symbol>
+    <symbol id="i-compuesto" viewBox="0 0 24 24"><path d="M4 19.5h16"/><path d="M5 16.5c5 0 8-2.5 9.5-6S18 5 20 5"/><path d="M16 5h4v4"/></symbol>
+    <symbol id="i-conversion" viewBox="0 0 24 24"><path d="M5 8h13l-3.5-3.5"/><path d="M19 16H6l3.5 3.5"/></symbol>
+    <symbol id="i-indexadas" viewBox="0 0 24 24"><path d="M18.5 5.5l-13 13"/><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/></symbol>
+    <symbol id="i-vencida" viewBox="0 0 24 24"><path d="M3 18.5h18"/><path d="M4 15.5v3"/><path d="M9.5 18.5v-8M14.5 18.5v-8M19.5 18.5v-8"/></symbol>
+    <symbol id="i-anticipada" viewBox="0 0 24 24"><path d="M3 18.5h18"/><path d="M20 15.5v3"/><path d="M4.5 18.5v-8M9.5 18.5v-8M14.5 18.5v-8"/></symbol>
+    <symbol id="i-perpetua" viewBox="0 0 24 24"><path d="M12 12c-1.8-2.3-3.3-3.5-5-3.5a3.5 3.5 0 0 0 0 7c1.7 0 3.2-1.2 5-3.5zm0 0c1.8 2.3 3.3 3.5 5 3.5a3.5 3.5 0 0 0 0-7c-1.7 0-3.2 1.2-5 3.5z"/></symbol>
+    <symbol id="i-historial" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4.5V9h4.5"/><path d="M12 8v4.5l3 2"/></symbol>
+    <symbol id="i-ajustes" viewBox="0 0 24 24"><path d="M4 7.5h9M18 7.5h2M4 16.5h3M11 16.5h9"/><circle cx="15.5" cy="7.5" r="2.5"/><circle cx="8.5" cy="16.5" r="2.5"/></symbol>
+    <symbol id="i-instalar" viewBox="0 0 24 24"><path d="M12 4v10.5M7.5 10l4.5 4.5 4.5-4.5"/><path d="M5 15.5V18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2.5"/></symbol>
+    <symbol id="i-cerrar" viewBox="0 0 24 24"><path d="M7 7l10 10M17 7L7 17"/></symbol>
+  </svg>
+
+  <div class="app">
+    <header class="barra-superior" id="barra-superior">
+      <button class="boton-icono" id="volver" type="button" aria-label="Volver al inicio">
+        <svg class="icono" width="24" height="24"><use href="#i-atras"/></svg>
+      </button>
+      <p class="barra-superior__titulo" id="titulo-barra">Calculadora Financiera</p>
+      <button class="boton-icono" id="cambiar-tema" type="button" aria-label="Cambiar a modo oscuro">
+        <svg class="icono" width="22" height="22"><use id="icono-tema" href="#i-luna"/></svg>
+      </button>
+    </header>
+
+    <main>
+      <!-- ===================== Inicio ===================== -->
+      <section class="pantalla" id="pantalla-inicio" aria-labelledby="titulo-inicio">
+        <div class="portada" id="portada">
+          <p class="antetitulo">Ingeniería Económica</p>
+          <h1 class="portada__titulo" id="titulo-inicio" data-titulo-grande>Calculadora Financiera</h1>
+          <p class="portada__texto">Elige una operación. Cada resultado muestra la fórmula de la hoja de clase que se usó.</p>
+        </div>
+
+        <div class="aviso" id="aviso-movimiento" role="note" hidden>
+          <p>Tu equipo tiene desactivados los efectos de animación, así que la app solo muestra fundidos suaves.</p>
+          <div class="aviso__acciones">
+            <button class="boton boton--chico boton--primario" id="activar-animaciones" type="button">Ver animaciones</button>
+            <button class="boton boton--chico" id="descartar-aviso" type="button">Así está bien</button>
+          </div>
+        </div>
+
+        <div class="aviso" id="aviso-instalar" role="note" hidden>
+          <p><strong>Instala la calculadora.</strong> Ábrela desde la pantalla de inicio, como cualquier app, y úsala también sin internet.</p>
+          <div class="aviso__acciones">
+            <button class="boton boton--chico boton--primario" id="instalar-desde-inicio" type="button">
+              <svg class="icono" width="18" height="18" aria-hidden="true"><use href="#i-instalar"/></svg>
+              Instalar
+            </button>
+            <button class="boton boton--chico" id="descartar-instalar" type="button">Ahora no</button>
+          </div>
+        </div>
+
+        <ul class="modulos" id="modulos">
+          <li style="--i: 0">
+            <a class="modulo" href="#interes-compuesto">
+              <span class="modulo__icono vt-icono-compuesto"><svg class="icono" width="24" height="24"><use href="#i-compuesto"/></svg></span>
+              <span class="modulo__texto">
+                <span class="modulo__nombre vt-titulo-compuesto">Interés compuesto</span>
+                <span class="modulo__desc">Valor presente, valor futuro, tasa o tiempo</span>
+              </span>
+              <svg class="icono modulo__flecha" width="20" height="20"><use href="#i-adelante"/></svg>
+            </a>
+          </li>
+          <li style="--i: 1">
+            <div class="modulo modulo--pronto" aria-disabled="true">
+              <span class="modulo__icono"><svg class="icono" width="24" height="24"><use href="#i-conversion"/></svg></span>
+              <span class="modulo__texto">
+                <span class="modulo__nombre">Conversión de tasas</span>
+                <span class="modulo__desc">Nominal, efectiva, vencida y anticipada</span>
+              </span>
+              <span class="etiqueta">Pronto</span>
+            </div>
+          </li>
+          <li style="--i: 2">
+            <div class="modulo modulo--pronto" aria-disabled="true">
+              <span class="modulo__icono"><svg class="icono" width="24" height="24"><use href="#i-indexadas"/></svg></span>
+              <span class="modulo__texto">
+                <span class="modulo__nombre">Tasas indexadas</span>
+                <span class="modulo__desc">DTF, IBR, IPC y UVR más puntos</span>
+              </span>
+              <span class="etiqueta">Pronto</span>
+            </div>
+          </li>
+          <li style="--i: 3">
+            <div class="modulo modulo--pronto" aria-disabled="true">
+              <span class="modulo__icono"><svg class="icono" width="24" height="24"><use href="#i-vencida"/></svg></span>
+              <span class="modulo__texto">
+                <span class="modulo__nombre">Anualidad vencida</span>
+                <span class="modulo__desc">Pagos al final de cada periodo</span>
+              </span>
+              <span class="etiqueta">Pronto</span>
+            </div>
+          </li>
+          <li style="--i: 4">
+            <div class="modulo modulo--pronto" aria-disabled="true">
+              <span class="modulo__icono"><svg class="icono" width="24" height="24"><use href="#i-anticipada"/></svg></span>
+              <span class="modulo__texto">
+                <span class="modulo__nombre">Anualidad anticipada</span>
+                <span class="modulo__desc">Pagos al inicio de cada periodo</span>
+              </span>
+              <span class="etiqueta">Pronto</span>
+            </div>
+          </li>
+          <li style="--i: 5">
+            <div class="modulo modulo--pronto" aria-disabled="true">
+              <span class="modulo__icono"><svg class="icono" width="24" height="24"><use href="#i-perpetua"/></svg></span>
+              <span class="modulo__texto">
+                <span class="modulo__nombre">Anualidad perpetua</span>
+                <span class="modulo__desc">Pagos que no terminan</span>
+              </span>
+              <span class="etiqueta">Pronto</span>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <!-- ===================== Interés compuesto ===================== -->
+      <section class="pantalla" id="pantalla-interes-compuesto" aria-labelledby="titulo-compuesto" hidden>
+        <div class="encabezado">
+          <span class="encabezado__icono vt-icono-compuesto" aria-hidden="true"><svg class="icono" width="26" height="26"><use href="#i-compuesto"/></svg></span>
+          <h1 class="encabezado__titulo vt-titulo-compuesto" id="titulo-compuesto" data-titulo-grande>Interés compuesto</h1>
+          <p class="encabezado__texto">Relaciona un valor de hoy con uno futuro, ganando interés sobre los intereses.</p>
+        </div>
+
+        <form id="form-compuesto" novalidate autocomplete="off">
+          <fieldset class="bloque">
+            <legend class="bloque__titulo">¿Qué quieres calcular?</legend>
+            <div class="segmentado" data-segmentado style="--opciones: 4">
+              <span class="segmentado__indicador" aria-hidden="true"></span>
+              <label class="segmentado__opcion segmentado__opcion--doble">
+                <input type="radio" name="incognita" value="F" checked>
+                <span class="segmentado__simbolo">F</span>
+                <span class="segmentado__texto">Futuro</span>
+              </label>
+              <label class="segmentado__opcion segmentado__opcion--doble">
+                <input type="radio" name="incognita" value="P">
+                <span class="segmentado__simbolo">P</span>
+                <span class="segmentado__texto">Presente</span>
+              </label>
+              <label class="segmentado__opcion segmentado__opcion--doble">
+                <input type="radio" name="incognita" value="i">
+                <span class="segmentado__simbolo">i</span>
+                <span class="segmentado__texto">Tasa</span>
+              </label>
+              <label class="segmentado__opcion segmentado__opcion--doble">
+                <input type="radio" name="incognita" value="n">
+                <span class="segmentado__simbolo">n</span>
+                <span class="segmentado__texto">Tiempo</span>
+              </label>
+            </div>
+            <button class="enlace" id="cargar-ejemplo" type="button">Cargar un ejemplo</button>
+          </fieldset>
+
+          <!-- Valor presente -->
+          <div class="plegable" data-campo="P">
+            <div class="plegable__interior">
+              <div class="campo" id="campo-P">
+                <label class="campo__etiqueta" for="entrada-P">Valor presente <span class="campo__simbolo">(P)</span></label>
+                <div class="entrada">
+                  <span class="entrada__adorno" aria-hidden="true">$</span>
+                  <input id="entrada-P" type="text" inputmode="decimal" enterkeyhint="next" placeholder="10000000" aria-describedby="ayuda-P leido-P error-P">
+                </div>
+                <p class="campo__ayuda" id="ayuda-P">Dinero que tienes o inviertes hoy.</p>
+                <p class="campo__leido" id="leido-P"></p>
+                <p class="campo__error" id="error-P" aria-live="polite"></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Valor futuro -->
+          <div class="plegable" data-campo="F">
+            <div class="plegable__interior">
+              <div class="campo" id="campo-F">
+                <label class="campo__etiqueta" for="entrada-F">Valor futuro <span class="campo__simbolo">(F)</span></label>
+                <div class="entrada">
+                  <span class="entrada__adorno" aria-hidden="true">$</span>
+                  <input id="entrada-F" type="text" inputmode="decimal" enterkeyhint="next" placeholder="15000000" aria-describedby="ayuda-F leido-F error-F">
+                </div>
+                <p class="campo__ayuda" id="ayuda-F">Dinero que tendrás o quieres tener al final del plazo.</p>
+                <p class="campo__leido" id="leido-F"></p>
+                <p class="campo__error" id="error-F" aria-live="polite"></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tasa -->
+          <div class="plegable" data-campo="tasa">
+            <div class="plegable__interior">
+              <div class="campo" id="campo-tasa">
+                <label class="campo__etiqueta" for="entrada-tasa">Tasa de interés <span class="campo__simbolo">(i)</span></label>
+                <div class="entrada">
+                  <input id="entrada-tasa" type="text" inputmode="decimal" enterkeyhint="next" placeholder="1,5" aria-describedby="traduccion-tasa error-tasa">
+                  <span class="entrada__adorno" aria-hidden="true">%</span>
+                </div>
+
+                <div class="opciones-tasa">
+                  <div class="opciones-tasa__tipo">
+                    <p class="control__etiqueta" id="etiqueta-tipo">Tipo</p>
+                    <div class="segmentado segmentado--compacto" data-segmentado style="--opciones: 2" role="radiogroup" aria-labelledby="etiqueta-tipo">
+                      <span class="segmentado__indicador" aria-hidden="true"></span>
+                      <label class="segmentado__opcion"><input type="radio" name="tipo-tasa" value="efectiva" checked>Efectiva</label>
+                      <label class="segmentado__opcion"><input type="radio" name="tipo-tasa" value="nominal">Nominal anual</label>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="control__etiqueta" for="periodo-tasa" id="etiqueta-periodo">Periodo de la tasa</label>
+                    <div class="selector">
+                      <select id="periodo-tasa">
+                        <option value="12" selected>Mensual</option>
+                        <option value="6">Bimestral</option>
+                        <option value="4">Trimestral</option>
+                        <option value="3">Cuatrimestral</option>
+                        <option value="2">Semestral</option>
+                        <option value="1">Anual</option>
+                      </select>
+                      <svg class="icono selector__flecha" width="18" height="18" aria-hidden="true"><use href="#i-abajo"/></svg>
+                    </div>
+                  </div>
+                  <div>
+                    <p class="control__etiqueta" id="etiqueta-modalidad">Modalidad</p>
+                    <div class="segmentado segmentado--compacto" data-segmentado style="--opciones: 2" role="radiogroup" aria-labelledby="etiqueta-modalidad">
+                      <span class="segmentado__indicador" aria-hidden="true"></span>
+                      <label class="segmentado__opcion"><input type="radio" name="modalidad-tasa" value="vencida" checked>Vencida</label>
+                      <label class="segmentado__opcion"><input type="radio" name="modalidad-tasa" value="anticipada">Anticipada</label>
+                    </div>
+                  </div>
+                </div>
+
+                <p class="campo__traduccion" id="traduccion-tasa">
+                  <svg class="icono" width="18" height="18" aria-hidden="true"><use href="#i-flecha"/></svg>
+                  <span id="traduccion-texto"></span>
+                </p>
+                <p class="campo__error" id="error-tasa" aria-live="polite"></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tiempo -->
+          <div class="campo" id="campo-tiempo">
+            <label class="campo__etiqueta" for="entrada-tiempo" id="etiqueta-tiempo">Tiempo <span class="campo__simbolo">(n)</span></label>
+            <div class="fila-tiempo" id="fila-tiempo">
+              <div class="entrada" id="caja-tiempo">
+                <input id="entrada-tiempo" type="text" inputmode="decimal" enterkeyhint="done" placeholder="24" aria-describedby="ayuda-tiempo error-tiempo">
+              </div>
+              <div class="selector">
+                <select id="unidad-tiempo" aria-label="Unidad del tiempo">
+                  <option value="12" selected>Meses</option>
+                  <option value="6">Bimestres</option>
+                  <option value="4">Trimestres</option>
+                  <option value="3">Cuatrimestres</option>
+                  <option value="2">Semestres</option>
+                  <option value="1">Años</option>
+                </select>
+                <svg class="icono selector__flecha" width="18" height="18" aria-hidden="true"><use href="#i-abajo"/></svg>
+              </div>
+            </div>
+            <p class="campo__ayuda" id="ayuda-tiempo">La tasa se convierte a esta unidad antes de calcular.</p>
+            <p class="campo__error" id="error-tiempo" aria-live="polite"></p>
+          </div>
+
+          <p class="error-general" id="error-general" role="alert" hidden></p>
+
+          <div class="acciones">
+            <button class="boton boton--secundario" id="limpiar" type="button">Limpiar</button>
+            <button class="boton boton--primario" type="submit">Calcular</button>
+          </div>
+        </form>
+
+        <!-- Resultado -->
+        <section class="resultado" id="resultado" aria-labelledby="resultado-etiqueta" hidden>
+          <p class="resultado__aviso" id="resultado-aviso" hidden>
+            <svg class="icono" width="18" height="18" aria-hidden="true"><use href="#i-info"/></svg>
+            Cambiaste los datos. Toca Calcular para actualizar el resultado.
+          </p>
+
+          <div class="tarjeta tarjeta--resultado">
+            <p class="resultado__etiqueta" id="resultado-etiqueta"></p>
+            <p class="resultado__valor" id="resultado-valor"></p>
+            <p class="resultado__momento" id="resultado-momento"></p>
+            <dl class="resultado__datos" id="resultado-extras"></dl>
+            <p class="resultado__interpretacion" id="resultado-interpretacion"></p>
+            <div class="resultado__acciones">
+              <button class="boton boton--chico" id="nuevo-calculo" type="button">Nuevo cálculo</button>
+              <button class="boton boton--chico" id="copiar-resultado" type="button">
+                <svg class="icono" width="18" height="18" aria-hidden="true"><use id="icono-copiar" href="#i-copiar"/></svg>
+                <span id="texto-copiar">Copiar resultado</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="tarjeta grafico" id="tarjeta-grafico">
+            <div class="grafico__encabezado">
+              <div class="grafico__fila">
+                <p class="grafico__titulo" id="titulo-grafico">Flujo de caja</p>
+                <div class="segmentado segmentado--mini" data-segmentado style="--opciones: 3" role="radiogroup" aria-label="Tipo de gráfico">
+                  <span class="segmentado__indicador" aria-hidden="true"></span>
+                  <label class="segmentado__opcion"><input type="radio" name="tipo-grafico" value="flujo" checked><svg class="icono" width="16" height="16" aria-hidden="true"><use href="#i-flujo"/></svg>Flujo</label>
+                  <label class="segmentado__opcion"><input type="radio" name="tipo-grafico" value="barras"><svg class="icono" width="16" height="16" aria-hidden="true"><use href="#i-barras"/></svg>Barras</label>
+                  <label class="segmentado__opcion"><input type="radio" name="tipo-grafico" value="area"><svg class="icono" width="16" height="16" aria-hidden="true"><use href="#i-area"/></svg>Área</label>
+                </div>
+              </div>
+              <p class="grafico__lectura" id="grafico-lectura"></p>
+            </div>
+            <canvas class="grafico__lienzo" id="grafico-compuesto" role="img" tabindex="0"></canvas>
+            <div class="grafico__leyenda" id="leyenda-flujo">
+              <span class="leyenda-flecha leyenda-flecha--sale">Sale dinero (inversión)</span>
+              <span class="leyenda-flecha leyenda-flecha--entra">Entra dinero</span>
+              <span class="leyenda-flecha leyenda-flecha--interes">Interés compuesto</span>
+            </div>
+            <div class="grafico__leyenda" id="leyenda-crecimiento" hidden>
+              <span class="leyenda">Capital</span>
+              <span class="leyenda leyenda--interes">Intereses</span>
+              <span class="leyenda leyenda--meta" id="leyenda-meta" hidden>Meta</span>
+            </div>
+            <p class="grafico__pista" id="grafico-pista">Desliza el dedo sobre la línea de tiempo para ver cuánto vale ese dinero en cada periodo.</p>
+
+            <div class="grafico__acciones" id="grafico-acciones">
+              <button class="boton-icono" id="repetir-grafico" type="button" aria-label="Repetir la animación" title="Repetir la animación">
+                <svg class="icono" width="20" height="20" aria-hidden="true"><use href="#i-repetir"/></svg>
+              </button>
+              <div class="grafico__botones">
+                <button class="boton boton--suave" id="abrir-ysi" type="button" aria-controls="ysi">
+                  <svg class="icono" width="18" height="18" aria-hidden="true"><use href="#i-ajustes"/></svg>
+                  ¿Y si…?
+                </button>
+                <button class="boton boton--suave" id="abrir-explicame" type="button" aria-controls="explicame">
+                  <svg class="icono" width="18" height="18" aria-hidden="true"><use href="#i-reproducir"/></svg>
+                  Explícame
+                </button>
+              </div>
+            </div>
+
+            <!-- ¿Y si…?: mover la tasa o el tiempo y ver el resultado cambiar en vivo -->
+            <div class="ysi" id="ysi" hidden>
+              <div class="ysi__cabeza">
+                <p class="ysi__titulo">¿Y si…?</p>
+                <div class="segmentado segmentado--mini" id="ysi-opciones" data-segmentado style="--opciones: 2" role="radiogroup" aria-label="Qué cambiar">
+                  <span class="segmentado__indicador" aria-hidden="true"></span>
+                  <label class="segmentado__opcion"><input type="radio" name="ysi-variable" value="tasa" checked>Tasa</label>
+                  <label class="segmentado__opcion"><input type="radio" name="ysi-variable" value="tiempo">Tiempo</label>
+                </div>
+              </div>
+              <div class="ysi__fila">
+                <label class="ysi__nombre" for="ysi-deslizador" id="ysi-nombre">Tasa</label>
+                <output class="ysi__valor" id="ysi-valor" for="ysi-deslizador"></output>
+              </div>
+              <div class="deslizador">
+                <input type="range" id="ysi-deslizador" min="0" max="100" step="1" value="0" aria-describedby="ysi-efecto">
+                <span class="deslizador__marca" aria-hidden="true"></span>
+              </div>
+              <div class="ysi__limites" aria-hidden="true">
+                <span id="ysi-minimo"></span>
+                <span class="ysi__original">tu cálculo</span>
+                <span id="ysi-maximo"></span>
+              </div>
+              <div class="ysi__comparacion" id="ysi-comparacion" aria-hidden="true"></div>
+              <p class="ysi__efecto" id="ysi-efecto"></p>
+              <p class="ysi__doble" id="ysi-doble"></p>
+              <div class="ysi__acciones">
+                <button class="boton boton--chico" id="ysi-volver" type="button">Volver a mi cálculo</button>
+                <button class="boton boton--chico boton--primario" id="ysi-listo" type="button">Listo</button>
+              </div>
+            </div>
+
+            <div class="explicame" id="explicame" hidden>
+              <div class="explicame__cabeza">
+                <p class="explicame__contador" id="explicame-contador"></p>
+                <button class="boton-voz" id="explicame-voz" type="button" aria-pressed="false" hidden>
+                  <svg class="icono boton-voz__icono" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M4 9.5h3.2L12 5.6v12.8l-4.8-3.9H4z"/>
+                    <path class="boton-voz__onda" d="M15.5 9.2a4 4 0 0 1 0 5.6"/>
+                    <path class="boton-voz__onda boton-voz__onda--lejos" d="M18.2 6.6a7.6 7.6 0 0 1 0 10.8"/>
+                  </svg>
+                  <span id="explicame-voz-texto">Escuchar</span>
+                </button>
+              </div>
+              <div class="explicame__cuerpo" id="explicame-cuerpo" aria-live="polite">
+                <p class="explicame__texto" id="explicame-texto"></p>
+                <p class="explicame__formula formula" id="explicame-formula" hidden></p>
+              </div>
+              <div class="explicame__puntos" id="explicame-puntos" aria-hidden="true"></div>
+              <div class="explicame__controles">
+                <button class="boton boton--chico" id="explicame-anterior" type="button">Anterior</button>
+                <button class="boton boton--chico boton--primario" id="explicame-siguiente" type="button">Siguiente</button>
+              </div>
+              <button class="boton-texto explicame__cerrar" id="explicame-cerrar" type="button">Cerrar la explicación</button>
+            </div>
+          </div>
+
+          <div class="tarjeta detalle">
+            <button class="detalle__boton" id="detalle-boton" type="button" aria-expanded="false" aria-controls="detalle-contenido">
+              ¿Cómo se calculó?
+              <svg class="icono" width="20" height="20" aria-hidden="true"><use href="#i-abajo"/></svg>
+            </button>
+            <div class="plegable plegable--cerrado" id="detalle-plegable">
+              <div class="plegable__interior" id="detalle-contenido" inert>
+                <ol class="pasos" id="detalle-pasos"></ol>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-- ===================== Historial ===================== -->
+      <section class="pantalla" id="pantalla-historial" aria-labelledby="titulo-historial" hidden>
+        <div class="encabezado">
+          <h1 class="encabezado__titulo" id="titulo-historial" data-titulo-grande>Historial</h1>
+          <p class="encabezado__texto">Tus últimos cálculos en este dispositivo. Toca uno para volver a verlo.</p>
+        </div>
+
+        <ul class="historial" id="historial-lista"></ul>
+
+        <div class="vacio" id="historial-vacio" hidden>
+          <span class="vacio__icono" aria-hidden="true"><svg class="icono" width="26" height="26"><use href="#i-historial"/></svg></span>
+          <p class="vacio__titulo">Aún no hay cálculos</p>
+          <p class="vacio__texto">Cada resultado que calcules quedará aquí para volver a verlo con un toque.</p>
+          <a class="boton boton--chico boton--primario" href="#interes-compuesto">Ir a interés compuesto</a>
+        </div>
+
+        <button class="boton-texto historial__borrar" id="historial-borrar" type="button" hidden>Borrar el historial</button>
+      </section>
+
+      <!-- ===================== Ayuda ===================== -->
+      <section class="pantalla" id="pantalla-ayuda" aria-labelledby="titulo-ayuda" hidden>
+        <div class="encabezado">
+          <h1 class="encabezado__titulo" id="titulo-ayuda" data-titulo-grande>Ayuda</h1>
+          <p class="encabezado__texto">Cómo usar la calculadora y qué significa cada término.</p>
+        </div>
+
+        <article class="tarjeta texto">
+          <h2>Interés compuesto</h2>
+          <p><strong>Cuándo usarlo:</strong> cuando un valor de hoy y uno futuro se relacionan con una tasa que capitaliza, como una inversión, un CDT o una deuda sin cuotas.</p>
+          <p><strong>Qué datos necesitas:</strong> tres de estos cuatro: valor presente (P), valor futuro (F), tasa (i) y tiempo (n). La app calcula el que falta.</p>
+        </article>
+
+        <article class="tarjeta texto">
+          <h2>Cómo escribir los números</h2>
+          <ul>
+            <li>Sin puntos de miles: <span class="ejemplo">1500000,50</span></li>
+            <li>Coma o punto para los decimales: <span class="ejemplo">1,5</span> o <span class="ejemplo">1.5</span></li>
+            <li>Debajo de cada valor en pesos verás cómo lo leyó la app.</li>
+          </ul>
+        </article>
+
+        <article class="tarjeta texto">
+          <h2>La tasa y el tiempo</h2>
+          <p>Indica cómo está expresada la tasa: efectiva o nominal anual, su periodo y si es vencida o anticipada. Antes de calcular, la app la convierte a la unidad del tiempo y te muestra la conversión con su número de fórmula.</p>
+        </article>
+
+        <article class="tarjeta texto">
+          <h2>Debajo del gráfico</h2>
+          <ul>
+            <li><strong>Explícame:</strong> recorre el resultado paso a paso. Con <strong>Escuchar</strong>, la app te lo explica en voz alta y avanza sola.</li>
+            <li><strong>¿Y si…?:</strong> mueve la tasa o el tiempo y mira cómo cambian el resultado y el gráfico. Compara con tu cálculo para ver el efecto exponencial.</li>
+            <li><strong>Historial:</strong> tus últimos cálculos quedan guardados en este dispositivo; toca uno para volver a verlo.</li>
+          </ul>
+        </article>
+
+        <h2 class="titulo-seccion">Glosario</h2>
+        <dl class="glosario">
+          <div class="glosario__item"><dt>Tasa efectiva</dt><dd>Interés que realmente se gana en un periodo. Ej.: 1,5 % efectiva mensual.</dd></div>
+          <div class="glosario__item"><dt>Efectiva anual (EA)</dt><dd>Rendimiento total de un año, con los intereses ya capitalizados.</dd></div>
+          <div class="glosario__item"><dt>Tasa nominal anual</dt><dd>Tasa anual que se reparte entre los periodos de capitalización. Ej.: 18 % nominal anual mes vencido = 1,5 % mensual.</dd></div>
+          <div class="glosario__item"><dt>Tasa periódica</dt><dd>Tasa de un solo periodo: mensual, trimestral, semestral…</dd></div>
+          <div class="glosario__item"><dt>Vencida</dt><dd>El interés se liquida al final del periodo.</dd></div>
+          <div class="glosario__item"><dt>Anticipada</dt><dd>El interés se cobra al inicio del periodo.</dd></div>
+          <div class="glosario__item"><dt>Capitalización</dt><dd>Sumar los intereses al capital para que también ganen interés.</dd></div>
+        </dl>
+        <p class="nota">La ayuda de los demás módulos se agregará cuando estén listos.</p>
+      </section>
+
+      <!-- ===================== Acerca de ===================== -->
+      <section class="pantalla" id="pantalla-acerca" aria-labelledby="titulo-acerca" hidden>
+        <div class="encabezado">
+          <h1 class="encabezado__titulo" id="titulo-acerca" data-titulo-grande>Acerca de</h1>
+        </div>
+
+        <article class="tarjeta texto">
+          <p class="antetitulo">Proyecto de aula</p>
+          <h2>Ingeniería Económica</h2>
+          <p>Calculadora financiera para resolver y validar las operaciones del curso. Las fórmulas siguen la hoja de fórmulas de clase y cada resultado indica el número de la fórmula usada.</p>
+        </article>
+
+        <article class="tarjeta texto">
+          <h2 id="titulo-animaciones">Animaciones</h2>
+          <div class="segmentado segmentado--compacto" data-segmentado style="--opciones: 3" role="radiogroup" aria-labelledby="titulo-animaciones">
+            <span class="segmentado__indicador" aria-hidden="true"></span>
+            <label class="segmentado__opcion"><input type="radio" name="movimiento" value="auto" checked>Automáticas</label>
+            <label class="segmentado__opcion"><input type="radio" name="movimiento" value="siempre">Siempre</label>
+            <label class="segmentado__opcion"><input type="radio" name="movimiento" value="reducidas">Reducidas</label>
+          </div>
+          <p class="nota-movimiento" id="nota-movimiento" hidden>Tu equipo pide reducir el movimiento, así que en modo automático la app usa solo fundidos. Elige <strong>Siempre</strong> para ver todas las animaciones.</p>
+        </article>
+
+        <article class="tarjeta texto" id="tarjeta-instalar">
+          <h2>App en tu celular</h2>
+          <p id="instalar-estado">Cuando la app esté publicada en internet, podrás instalarla y usarla sin conexión.</p>
+          <p class="instalar__listo" id="instalar-sin-internet" hidden>
+            <svg class="icono" width="18" height="18" aria-hidden="true"><use href="#i-listo"/></svg>
+            Lista para usar sin internet.
+          </p>
+          <button class="boton boton--chico boton--primario" id="instalar" type="button" hidden>
+            <svg class="icono" width="18" height="18" aria-hidden="true"><use href="#i-instalar"/></svg>
+            Instalar la app
+          </button>
+        </article>
+
+        <article class="tarjeta texto">
+          <h2>Integrantes</h2>
+          <p class="nota">Agrega aquí los nombres del grupo.</p>
+        </article>
+
+        <article class="tarjeta texto">
+          <h2>Estado</h2>
+          <p>Versión 0.3: módulo de interés compuesto, con explicación en voz alta, "¿Y si…?", historial y app instalable que funciona sin internet. Los demás módulos están en construcción.</p>
+          <a class="boton boton--chico" href="pruebas.html">Ver las pruebas de cálculo</a>
+        </article>
+      </section>
+    </main>
+
+    <nav class="barra-inferior" aria-label="Navegación principal">
+      <div class="barra-inferior__contenido">
+        <a class="nav__item" href="#inicio" data-nav="inicio">
+          <span class="nav__icono"><span class="nav__fondo" aria-hidden="true"></span><svg class="icono" width="22" height="22"><use href="#i-inicio"/></svg></span>
+          Inicio
+        </a>
+        <a class="nav__item" href="#historial" data-nav="historial">
+          <span class="nav__icono"><span class="nav__fondo" aria-hidden="true"></span><svg class="icono" width="22" height="22"><use href="#i-historial"/></svg></span>
+          Historial
+        </a>
+        <a class="nav__item" href="#ayuda" data-nav="ayuda">
+          <span class="nav__icono"><span class="nav__fondo" aria-hidden="true"></span><svg class="icono" width="22" height="22"><use href="#i-ayuda"/></svg></span>
+          Ayuda
+        </a>
+        <a class="nav__item" href="#acerca" data-nav="acerca">
+          <span class="nav__icono"><span class="nav__fondo" aria-hidden="true"></span><svg class="icono" width="22" height="22"><use href="#i-info"/></svg></span>
+          Acerca de
+        </a>
+      </div>
+    </nav>
+  </div>
+
+  <div class="aviso-flotante" id="aviso-flotante" role="status" hidden>
+    <span id="aviso-flotante-texto"></span>
+    <button class="aviso-flotante__accion" id="aviso-flotante-accion" type="button" hidden></button>
+  </div>
+
+  <p class="solo-lector" id="anuncio" aria-live="polite"></p>
+
+  <script src="finanzas.js"></script>
+  <script src="animaciones.js"></script>
+  <script src="voz.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pruebas de cálculo · Calculadora Financiera</title>
+  <link rel="stylesheet" href="estilos.css">
+  <script>
+    try {
+      const tema = localStorage.getItem("tema");
+      if (tema === "light" || tema === "dark") document.documentElement.dataset.theme = tema;
+    } catch (e) { /* se usa el tema del sistema */ }
+  </script>
+  <style>
+    .pruebas { max-width: 640px; margin: 0 auto; padding: 16px 16px 48px; }
+    .pruebas h1 { margin: 8px 0 6px; font-size: 26px; letter-spacing: -0.02em; }
+    .pruebas__intro { color: var(--texto-2); font-size: 15px; }
+    .pruebas__resumen { margin: 16px 0 8px; padding: 12px 14px; border-radius: var(--radio); font-weight: 600; }
+    .pruebas__resumen--ok { background: var(--primario-suave); color: var(--primario-fuerte); }
+    .pruebas__resumen--falla { background: var(--error-suave); color: var(--error); }
+    .grupo { margin-top: 24px; }
+    .grupo h2 { margin: 0 4px 10px; font-size: 16px; }
+    .casos { list-style: none; padding: 0; display: grid; gap: 8px; }
+    .caso { display: grid; grid-template-columns: 24px 1fr; gap: 10px; padding: 12px 14px; border-radius: var(--radio); background: var(--superficie); box-shadow: var(--sombra); }
+    .caso__marca { font-weight: 700; color: var(--exito); }
+    .caso--falla .caso__marca { color: var(--error); }
+    .caso__nombre { font-weight: 600; font-size: 15px; }
+    .caso__valores { margin-top: 2px; color: var(--texto-2); font-size: 13.5px; font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body>
+  <main class="pruebas">
+    <a class="boton-texto" href="index.html">← Volver a la calculadora</a>
+    <h1>Pruebas de cálculo</h1>
+    <p class="pruebas__intro">Cada caso compara el resultado de <code>finanzas.js</code> con el valor resuelto en <code>docs/02-modulos-y-formulas.md</code>. La tolerancia es media unidad del último decimal que se muestra.</p>
+    <p class="pruebas__resumen" id="resumen"></p>
+    <div id="grupos"></div>
+  </main>
+
+  <script src="finanzas.js"></script>
+  <script src="pruebas.js"></script>
+  <script>
+    const pesos = new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const seis = new Intl.NumberFormat("es-CO", { maximumFractionDigits: 6 });
+    const ocho = new Intl.NumberFormat("es-CO", { maximumFractionDigits: 8 });
+
+    function mostrar(valor, tipo) {
+      if (Number.isNaN(valor)) return "no existe (NaN)";
+      if (tipo === "dinero") return pesos.format(valor);
+      if (tipo === "tasa") return `${seis.format(valor * 100)} %`;
+      return ocho.format(valor);
+    }
+
+    const resultados = correrPruebas();
+    const fallas = resultados.filter((r) => !r.correcto).length;
+    const resumen = document.getElementById("resumen");
+    resumen.textContent = fallas
+      ? `${fallas} de ${resultados.length} pruebas fallaron`
+      : `${resultados.length} de ${resultados.length} pruebas correctas`;
+    resumen.classList.add(fallas ? "pruebas__resumen--falla" : "pruebas__resumen--ok");
+
+    const grupos = document.getElementById("grupos");
+    for (const nombre of [...new Set(resultados.map((r) => r.grupo))]) {
+      const seccion = document.createElement("section");
+      seccion.className = "grupo";
+      seccion.innerHTML = `<h2></h2><ul class="casos"></ul>`;
+      seccion.querySelector("h2").textContent = nombre;
+      for (const r of resultados.filter((r) => r.grupo === nombre)) {
+        const item = document.createElement("li");
+        item.className = `caso${r.correcto ? "" : " caso--falla"}`;
+        item.innerHTML = `<span class="caso__marca"></span><div><p class="caso__nombre"></p><p class="caso__valores"></p></div>`;
+        item.querySelector(".caso__marca").textContent = r.correcto ? "✓" : "✗";
+        item.querySelector(".caso__nombre").textContent = r.nombre;
+        item.querySelector(".caso__valores").textContent = `Esperado ${mostrar(r.esperado, r.tipo)} · obtenido ${mostrar(r.obtenido, r.tipo)}`;
+        seccion.querySelector(".casos").append(item);
+      }
+      grupos.append(seccion);
+    }
+  </script>
+</body>
+</html>
