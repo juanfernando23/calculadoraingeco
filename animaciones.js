@@ -1633,16 +1633,22 @@ function crearGraficoCrecimiento(canvas, datosIniciales) {
       pintar();
       return;
     }
-    saltarPulso = reproducir(
+    let latiendo = true;
+    const saltar = reproducir(
       (t) => {
         if (destruido) return;
         anillo = t < 1 ? t : null;
         alfaBurbuja = suavizar(Math.min(1, t * 2.2));
         pintar();
+        if (t >= 1 && latiendo) {
+          latiendo = false;
+          saltarPulso = null; // terminó: el gráfico vuelve a responder al dedo
+        }
       },
       900,
       () => !enPantalla
     );
+    if (latiendo) saltarPulso = saltar;
   }
 
   // Lleva el gráfico a otro estado: { visibles (barras mostradas), enfoque, notas }.
@@ -1836,20 +1842,24 @@ function crearGraficoCrecimiento(canvas, datosIniciales) {
     return mejor;
   }
 
+  // Mientras el gráfico se construye, se transforma o late el pulso del final, no responde a
+  // toques, al mouse ni al teclado: la animación siempre se ve completa y a su velocidad (en
+  // el celular, el dedo que pasa por encima al desplazar la página no la corta). Para verla
+  // otra vez, "Repetir".
+  function estaAnimando() {
+    return Boolean(saltarAnimacion || saltarPulso);
+  }
+
   function alPresionar(evento) {
-    if (saltarAnimacion) {
-      saltarAnimacion(); // tocar durante la animación la lleva al final
-      return;
-    }
-    if (!medidas) return;
-    detenerPulso();
+    if (estaAnimando() || !medidas) return;
+    detenerPulso(); // el pulso que esperaba al deslizador de "¿Y si…?" ya no hace falta
     arrastrando = true;
     canvas.setPointerCapture?.(evento.pointerId);
     inspeccionar(masCercano(evento));
   }
 
   function alMover(evento) {
-    if (saltarAnimacion || !medidas) return;
+    if (estaAnimando() || !medidas) return;
     if (!arrastrando && evento.pointerType !== "mouse") return;
     const objetivo = masCercano(evento);
     if (objetivo.k !== inspeccion) inspeccionar(objetivo);
@@ -1864,7 +1874,7 @@ function crearGraficoCrecimiento(canvas, datosIniciales) {
   }
 
   function alTeclear(evento) {
-    if (saltarAnimacion || !medidas) return;
+    if (estaAnimando() || !medidas) return;
     const lista = objetivos();
     const encontrado = lista.findIndex((objetivo) => objetivo.k === inspeccion);
     const actual = encontrado >= 0 ? encontrado : lista.length - 1;
