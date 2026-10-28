@@ -1135,6 +1135,15 @@ a.modulo:hover .modulo__flecha { transform: translateX(calc(3px * var(--mov))); 
 
 .explicame__cabeza { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 32px; }
 
+/* En las cadenas (conversión e indexadas), largas, el panel queda fijo sobre la barra inferior
+   mientras la página lleva a la vista el paso que se explica. */
+.grafico--cadena .explicame {
+  position: sticky;
+  bottom: calc(73px + env(safe-area-inset-bottom));
+  z-index: 2;
+  box-shadow: 0 -6px 24px rgb(0 0 0 / 0.1);
+}
+
 /* Voz: las ondas del parlante laten mientras la app explica en voz alta */
 .boton-voz {
   display: inline-flex;

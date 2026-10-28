@@ -266,13 +266,13 @@
     const formulaUsada = formulaDe(r);
     if (r.incognita === "i") {
       pasos.push({
-        titulo: "Método numérico (no está en la hoja)",
+        titulo: "Método numérico (la tasa no tiene despeje)",
         lineas: [
           `La tasa no tiene despeje. Se usa la fórmula ${insignia(formulaUsada.base)}${formula(formulaUsada.html)}`,
           "y se prueba con tasas cada vez más cercanas (bisección): si el resultado se pasa, la tasa baja; si no alcanza, sube.",
         ],
       });
-    } else pasos.push({ titulo: "Fórmula de la hoja de clase", lineas: [`${insignia(formulaUsada.numero)}${formula(formulaUsada.html)}`] });
+    } else pasos.push({ titulo: "Fórmula", lineas: [`${insignia(formulaUsada.numero)}${formula(formulaUsada.html)}`] });
     pasos.push(lineasNumeros(sustitucion(r)));
 
     let v;
@@ -359,7 +359,7 @@
       calculo: r,
       pasos,
       numeroFormula: formulaUsada.numero === "extra" ? `${formulaUsada.base} (con bisección)` : formulaUsada.numero,
-      fuente: formulaUsada.numero === "extra" ? `Fórmula ${formulaUsada.base} de la hoja de clase, resuelta por bisección.` : `Fórmula ${formulaUsada.numero} de la hoja de clase.`,
+      fuente: formulaUsada.numero === "extra" ? `Fórmula ${formulaUsada.base}, resuelta por bisección.` : `Fórmula ${formulaUsada.numero}.`,
       resumen: resumenPartes.join(" · "),
       visual: {
         tipo: "pagos",
@@ -378,53 +378,75 @@
           tasa: `${porcentaje(i)} ${p.adjetivo}`,
         },
       },
-      explicacion: () => explicar(r, formulaUsada),
+      explicacion: (g, vista) => explicar(r, formulaUsada, vista),
     };
   }
 
-  // "Explícame": los pagos, el viaje del primero y del último, la suma, la fórmula y el total.
-  function explicar(r, formulaUsada) {
+  // "Explícame": los pagos, el primero y el último, la suma, la fórmula y el total. Cada paso
+  // dice lo que muestra la vista del diagrama: en "flujo", las flechas de los pagos, la flecha
+  // grande y el viaje de cada pago (su arco); en "valor", una barra por pago con lo que vale.
+  function explicar(r, formulaUsada, vista) {
     const { P, F, A, i, n, p } = r;
     const a = r.anticipada;
+    const enBarras = vista === "valor";
     const ultimoPago = a ? Math.ceil(n - 1e-9) - 1 : Math.ceil(n - 1e-9);
+    // En "valor" la última barra es la del último pago completo.
+    const ultimoVisto = enBarras && !esEntero(n) ? ultimoPago - 1 : ultimoPago;
     const primerPago = a ? 0 : 1;
     const pasosDe = (k) => `${cifra(k)} ${k === 1 ? p.singular : p.plural}`;
     const lista = [];
     const deA = r.incognita === "A" ? "La cuota A (la incógnita)" : `Una cuota de ${pesos(A)}`;
+    const cuando = `${a ? "al inicio" : "al final"} de cada ${p.singular}`;
     lista.push({
-      texto: `${deA} ${a ? "al inicio" : "al final"} de cada ${p.singular}, ${pagos(n)} en total. ${r.desde === "P" ? "Todos juntos equivalen a un solo valor hoy: P." : "Todos juntos se convierten en un solo valor al final: F."}`,
+      texto: enBarras
+        ? `${deA} ${cuando}, ${pagos(n)} en total: una barra por pago. Su altura es lo que vale ese pago ${r.desde === "P" ? "hoy" : "al final"}.`
+        : `${deA} ${cuando}, ${pagos(n)} en total: las flechas pequeñas. ${r.desde === "P" ? "Todos juntos equivalen a un solo valor hoy: P, la flecha grande." : "Todos juntos se convierten en un solo valor al final: F, la flecha grande."}`,
       vista: { enfoque: "pagos" },
     });
     if (r.desde === "P") {
       const hoy1 = vpCompuesto(A, i, primerPago); // Hoja 2.2
+      const ultimo = vpCompuesto(A, i, ultimoVisto); // Hoja 2.2
       lista.push({
         texto: a
-          ? `El primer pago se hace hoy, así que vale completo: ${pesos(hoy1)}. Los demás valen menos hoy: cada ${p.singular} de espera se dividen entre ${decimal(1 + i)}.`
-          : `Un pago futuro vale menos hoy: se divide entre ${decimal(1 + i)} por cada ${p.singular} de espera. El primero, a 1 ${p.singular}, hoy vale ${pesos(hoy1)}.`,
-        vista: { enfoque: "viaje", arco: "primero", nota: true },
-      });
-      lista.push({ texto: `El último, a ${pasosDe(ultimoPago)}, hoy vale ${pesos(vpCompuesto(A, i, ultimoPago))}.`, vista: { enfoque: "viaje", arco: "ultimo", nota: true } });
-      lista.push({ texto: `La suma de lo que vale hoy cada pago es el valor presente: ${pesos(P)}.`, vista: { enfoque: "grande", arco: "todos" } });
-    } else {
-      const fin = a ? Math.ceil(n - 1e-9) : Math.ceil(n - 1e-9);
-      lista.push({
-        texto: `Cada pago gana intereses hasta el final: se multiplica por ${decimal(1 + i)} por cada ${p.singular} que falta. El primero, al final, vale ${pesos(vfCompuesto(A, i, fin - primerPago))}.`,
+          ? `El primer pago se hace hoy, así que vale completo: ${pesos(hoy1)}${enBarras ? ", la primera barra" : ""}. Los demás valen menos hoy: cada ${p.singular} de espera se dividen entre ${decimal(1 + i)}.`
+          : `Un pago futuro vale menos hoy: se divide entre ${decimal(1 + i)} por cada ${p.singular} de espera. El primero, a 1 ${p.singular}, hoy vale ${pesos(hoy1)}${enBarras ? ": la primera barra" : ""}.`,
         vista: { enfoque: "viaje", arco: "primero", nota: true },
       });
       lista.push({
-        texto: a ? `El último gana un solo ${p.singular} de interés: vale ${pesos(vfCompuesto(A, i, 1))}.` : `El último llega justo al final: no alcanza a ganar intereses y vale ${pesos(A)}.`,
+        texto: enBarras
+          ? `El último${ultimoVisto !== ultimoPago ? " completo" : ""}, a ${pasosDe(ultimoVisto)}, hoy vale ${pesos(ultimo)}: la barra más baja. Mientras más lejos el pago, menos vale hoy.`
+          : `El último, a ${pasosDe(ultimoPago)}, hoy vale ${pesos(ultimo)}: su arco es el más largo.`,
         vista: { enfoque: "viaje", arco: "ultimo", nota: true },
       });
-      lista.push({ texto: `La suma de lo que vale cada pago al final es el valor futuro: ${pesos(F)}.`, vista: { enfoque: "grande", arco: "todos" } });
+      lista.push({
+        texto: enBarras ? `Sumadas, todas las barras dan el valor presente: ${pesos(P)}.` : `La suma de lo que vale hoy cada pago es el valor presente: ${pesos(P)}, la flecha grande.`,
+        vista: { enfoque: "grande", arco: "todos" },
+      });
+    } else {
+      const fin = Math.ceil(n - 1e-9);
+      lista.push({
+        texto: `Cada pago gana intereses hasta el final: se multiplica por ${decimal(1 + i)} por cada ${p.singular} que falta. El primero, al final, vale ${pesos(vfCompuesto(A, i, fin - primerPago))}${enBarras ? ": la primera barra, la más alta" : ""}.`,
+        vista: { enfoque: "viaje", arco: "primero", nota: true },
+      });
+      lista.push({
+        texto: a
+          ? `El último gana un solo ${p.singular} de interés: vale ${pesos(vfCompuesto(A, i, 1))}${enBarras ? ", la última barra" : ""}.`
+          : `El último llega justo al final: no alcanza a ganar intereses y vale ${pesos(A)}${enBarras ? ", la última barra, sin parte ámbar" : ""}.`,
+        vista: { enfoque: "viaje", arco: "ultimo", nota: true },
+      });
+      lista.push({
+        texto: enBarras ? `Sumadas, todas las barras dan el valor futuro: ${pesos(F)}.` : `La suma de lo que vale cada pago al final es el valor futuro: ${pesos(F)}, la flecha grande.`,
+        vista: { enfoque: "grande", arco: "todos" },
+      });
     }
     if (r.incognita === "i") {
+      const meta = r.desde === "P" ? `el valor presente de las cuotas diera ${pesos(P)}` : `el valor futuro de las cuotas diera ${pesos(F)}`;
       lista.push({
-        texto: `La tasa no tiene despeje en la hoja: se probaron tasas en la fórmula ${formulaUsada.base} (bisección) hasta que dio el valor buscado. Resultado: ${porcentaje(i)} ${p.nombreTasa}.`,
-        voz: `La tasa no tiene despeje en la hoja: se probaron tasas en la fórmula ${formulaUsada.base} hasta que dio el valor buscado. Resultado: ${porcentaje(i)} ${p.nombreTasa}.`,
+        texto: `La tasa no se puede despejar: se probaron tasas cada vez más cercanas (bisección) hasta que ${meta}. Resultado: ${porcentaje(i)} ${p.nombreTasa}.`,
         vista: { enfoque: "todo" },
       });
     } else {
-      lista.push({ texto: `Eso es la fórmula ${formulaUsada.numero.replace(" (despeje)", "")} de la hoja de clase:`, formula: formulaUsada.html, vista: { enfoque: "todo" } });
+      lista.push({ texto: "Todo eso lo resume la fórmula:", formula: formulaUsada.html, vista: { enfoque: "todo" } });
     }
     const total = A * n;
     lista.push({
@@ -540,8 +562,8 @@
       document.getElementById("icono-anualidad-uso").setAttribute("href", esAnticipada ? "#i-anticipada" : "#i-vencida");
       titulo.textContent = esAnticipada ? "Anualidad anticipada" : "Anualidad vencida";
       document.getElementById("texto-anualidad").textContent = esAnticipada
-        ? "Pagos iguales al inicio de cada periodo: el primero, hoy. Fórmulas 6.1 a 6.3."
-        : "Pagos iguales al final de cada periodo: el primero, dentro de un periodo. Fórmulas 5.1 a 5.3.";
+        ? "Pagos iguales al inicio de cada periodo: el primero, hoy."
+        : "Pagos iguales al final de cada periodo: el primero, dentro de un periodo.";
       icono.style.viewTransitionName = esAnticipada ? "icono-anticipada" : "icono-vencida";
       titulo.style.viewTransitionName = esAnticipada ? "titulo-anticipada" : "titulo-vencida";
       traducir(false);
@@ -612,7 +634,7 @@
     const pasos = [
       { titulo: "Datos", lineas: [esP ? `Pago de cada ${p.singular}: ${formula(`${variable("A")} = ${pesos(A)}`)}` : `Capital: ${formula(`${variable("P")} = ${pesos(P)}`)}`, `Tasa: ${describirTasa(r.tasa)}`] },
       pasoDeTasa(r.tasa, r.conversion, p),
-      { titulo: "Fórmula de la hoja de clase (sección 7)", lineas: [`${insignia("7")}${formula(esP ? `${variable("P")} = ${variable("A")} / ${variable("i")}` : `${variable("A")} = ${variable("P")} · ${variable("i")}`)}`] },
+      { titulo: "Fórmula", lineas: [`${insignia("7")}${formula(esP ? `${variable("P")} = ${variable("A")} / ${variable("i")}` : `${variable("A")} = ${variable("P")} · ${variable("i")}`)}`] },
       lineasNumeros(esP ? [`${variable("P")} = ${cifra(A)} / ${decimal(i)}`, `${variable("P")} = <strong>${pesos(P)}</strong>`] : [`${variable("A")} = ${cifra(P)} · ${decimal(i)}`, `${variable("A")} = <strong>${pesos(A)}</strong>`]),
       { titulo: "Interpretación", lineas: [`Los intereses de cada ${p.singular} (${pesos(P)} · ${porcentaje(i)} = ${pesos(A)}) alcanzan justo para el pago: el capital nunca se gasta.`] },
     ];
@@ -629,22 +651,43 @@
         : `Con ${pesos(P)} a ${porcentaje(i)} ${p.nombreTasa} se pueden retirar ${pesos(A)} cada ${p.singular}, para siempre: es justo el interés de cada periodo.`,
       pasos,
       numeroFormula: "de la sección 7",
-      fuente: "Sección 7 de la hoja de clase (anualidades perpetuas).",
+      fuente: "Fórmula de la anualidad perpetua.",
       resumen: `${esP ? `A = ${pesos(A)}` : `P = ${pesos(P)}`} · ${describirTasa(r.tasa)} · cada ${p.singular}`,
       visual: {
         tipo: "perpetua",
         descripcion: `Diagrama de flujo de caja de una perpetuidad: ${pesos(A)} cada ${p.singular} para siempre equivalen a ${pesos(P)} hoy.`,
         datos: { modalidad: "perpetua", incognita: r.incognita, base: "P", P, A, i, n: 0, singular: p.singular, plural: p.plural, tasa: `${porcentaje(i)} ${p.adjetivo}` },
       },
-      explicacion: () => [
-        { texto: `${esP ? `Se quieren pagar ${pesos(A)}` : "Se quiere saber cuánto se puede pagar"} cada ${p.singular}, sin fin, el primero dentro de un ${p.singular}.`, vista: { enfoque: "pagos" } },
-        { texto: `Un pago lejano vale casi nada hoy. El primero, a 1 ${p.singular}, hoy vale ${pesos(vpCompuesto(A, i, 1))}.`, vista: { enfoque: "viaje", arco: "primero", nota: true } },
-        { texto: `El quinto, a 5 ${p.plural}, hoy vale ${pesos(vpCompuesto(A, i, 5))}. Mientras más lejos, menos vale.`, vista: { enfoque: "viaje", arco: "ultimo", nota: true } },
-        { texto: `Por eso infinitos pagos suman un valor finito: ${pesos(P)}. Con más y más pagos la suma se acerca a ese valor, sin pasarlo.`, vista: { enfoque: "grande", arco: "todos" } },
-        { texto: "Eso es la fórmula de la sección 7 de la hoja de clase:", formula: esP ? `${variable("P")} = ${variable("A")} / ${variable("i")}` : `${variable("A")} = ${variable("P")} · ${variable("i")}`, vista: { enfoque: "todo" } },
-        { texto: `Visto al revés: los intereses de cada ${p.singular}, ${pesos(P)} por ${porcentaje(i)}, dan justo ${pesos(A)}. El pago sale de los intereses y el capital queda intacto.`, vista: { enfoque: "todo" } },
-      ],
+      explicacion: (g, vista) => explicarPerpetua(r, vista),
     };
+  }
+
+  // "Explícame" de la perpetua según la vista: en "flujo", los pagos y el viaje del primero y
+  // del quinto hasta hoy; en "suma", la curva de los pagos sumados y sus hitos (50 % y 99 % de P).
+  function explicarPerpetua(r, vista) {
+    const { P, A, i, p } = r;
+    const esP = r.incognita === "P";
+    const quePago = `${esP ? `Se quieren pagar ${pesos(A)}` : "Se quiere saber cuánto se puede pagar"} cada ${p.singular}, sin fin, el primero dentro de un ${p.singular}`;
+    const lista = [];
+    if (vista === "suma") {
+      // Con cuántos pagos se cubre una parte de P: 1 − (1 + i)^−k ≥ meta (como los hitos del gráfico).
+      const pagosPara = (meta) => Math.ceil(Math.log(1 / (1 - meta)) / Math.log(1 + i));
+      lista.push({ texto: `${quePago}. La curva suma lo que vale hoy cada pago, uno tras otro.`, vista: { enfoque: "pagos" } });
+      lista.push({ texto: `Con ${cifra(pagosPara(0.5))} pagos la suma ya cubre la mitad de P: el ${porcentaje(0.5)}.`, vista: { enfoque: "viaje", arco: "primero" } });
+      lista.push({ texto: `Con ${cifra(pagosPara(0.99))} pagos llega al ${porcentaje(0.99)}: los pagos lejanos ya casi no suman.`, vista: { enfoque: "viaje", arco: "ultimo" } });
+      lista.push({ texto: `Por eso infinitos pagos suman un valor finito: ${pesos(P)}, la línea de arriba. La curva se acerca a ella sin pasarla.`, vista: { enfoque: "grande", arco: "todos" } });
+    } else {
+      lista.push({ texto: `${quePago}: las flechas pequeñas, que siguen para siempre.`, vista: { enfoque: "pagos" } });
+      lista.push({ texto: `Un pago lejano vale casi nada hoy. El primero, a 1 ${p.singular}, hoy vale ${pesos(vpCompuesto(A, i, 1))}.`, vista: { enfoque: "viaje", arco: "primero", nota: true } });
+      lista.push({ texto: `El quinto, a 5 ${p.plural}, hoy vale ${pesos(vpCompuesto(A, i, 5))}. Mientras más lejos, menos vale.`, vista: { enfoque: "viaje", arco: "ultimo", nota: true } });
+      lista.push({
+        texto: `Por eso infinitos pagos suman un valor finito: ${pesos(P)}, la flecha grande. Con más y más pagos la suma se acerca a ese valor, sin pasarlo.`,
+        vista: { enfoque: "grande", arco: "todos" },
+      });
+    }
+    lista.push({ texto: "Todo eso lo resume la fórmula:", formula: esP ? `${variable("P")} = ${variable("A")} / ${variable("i")}` : `${variable("A")} = ${variable("P")} · ${variable("i")}`, vista: { enfoque: "todo" } });
+    lista.push({ texto: `Visto al revés: los intereses de cada ${p.singular}, ${pesos(P)} por ${porcentaje(i)}, dan justo ${pesos(A)}. El pago sale de los intereses y el capital queda intacto.`, vista: { enfoque: "todo" } });
+    return lista;
   }
 
   const perpetua = {

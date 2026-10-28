@@ -110,7 +110,7 @@
       pasos,
       numeroFormula: formulas.join(", ") || "—",
       fuente: formulas.length
-        ? `${formulas.length > 1 ? "Fórmulas" : "Fórmula"} ${listaDeFormulas(formulas)} de la hoja de clase${directa ? ` (juntas, la ${directa.numero})` : ""}.`
+        ? `${formulas.length > 1 ? "Fórmulas" : "Fórmula"} ${listaDeFormulas(formulas)}${directa ? ` (juntas, la ${directa.numero})` : ""}.`
         : "Sin conversión: la tasa ya estaba en esa forma.",
       resumen: `${deOrigen} → ${deDestino}`,
       visual: {
@@ -135,7 +135,7 @@
     conversion.pasos.forEach((paso, k) => pasos.push({ texto: textoDeConversion(paso), vista: { paso: k + 1 } }));
     const directa = formulaDirecta(r);
     pasos.push({
-      texto: `Resultado: ${porcentaje(valor)} ${describirForma(r.destino)}.${directa ? ` Los dos pasos juntos son la fórmula ${directa.numero} de la hoja.` : ""} Todas las tasas de la cadena son equivalentes: dan ${porcentaje(ea)} efectivo anual.`,
+      texto: `Resultado: ${porcentaje(valor)} ${describirForma(r.destino)}.${directa ? ` Los dos pasos se pueden hacer en uno solo, ${directa.numero === "1.3" ? "de nominal a efectiva anual" : "de efectiva anual a nominal"}.` : ""} Todas las tasas de la cadena son equivalentes: dan ${porcentaje(ea)} efectivo anual.`,
       vista: { paso: nodos.length - 1 },
     });
     return pasos;

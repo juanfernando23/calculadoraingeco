@@ -475,6 +475,12 @@ function crearDiagramaPagos(canvas, datosIniciales) {
       const barra = barras[guia.k];
       burbuja(ctx, datos.dinero(barra.valor), m.x(guia.k), m.y(barra.capital + barra.interes) - 8, alfaVista * guia.alfa);
     }
+    // En "Explícame", lo que vale el pago del que se habla (el primero o el último), sobre su barra.
+    if (enfoque.nota && (enfoque.arco === "primero" || enfoque.arco === "ultimo") && barras.length) {
+      const j = enfoque.arco === "primero" ? 0 : barras.length - 1;
+      const barra = barras[j];
+      burbuja(ctx, `${datos.base === "F" ? "Al final" : "Hoy"} vale ${datos.dinero(barra.valor)}`, m.x(j), m.y(barra.capital + barra.interes) - 8, alfaVista * enfoque.notaAlfa);
+    }
     if (anillo !== null && barras.length) {
       const j = datos.base === "F" ? 0 : barras.length - 1;
       ctx.globalAlpha = 0.5 * (1 - anillo) * alfaVista;
@@ -579,7 +585,8 @@ function crearDiagramaPagos(canvas, datosIniciales) {
       ctx.lineTo(x, m.abajo);
       ctx.stroke();
       ctx.setLineDash([]);
-      punto(ctx, x, y, alfaVista * (enfoque.arco === null || enfoque.arco === "todos" ? 1 : enfoque.arco === "primero" ? (j === 0 ? 1 : 0.3) : j === 2 ? 1 : 0.3));
+      const nitido = enfoque.arco === null || enfoque.arco === "todos" ? 1 : enfoque.arco === "primero" ? (j === 0 ? 1 : 0.3) : j === 2 ? 1 : 0.3;
+      punto(ctx, x, y, alfaVista * nitido);
       // 50 %: a la derecha del punto; 90 %: debajo; 99 %: encima, junto al borde.
       const lugar = [
         { x: x + 10, y: y + 4, alinear: "left" },
@@ -591,7 +598,7 @@ function crearDiagramaPagos(canvas, datosIniciales) {
         peso: 600,
         tamano: 10.5,
         color: colores.textoFuerte,
-        alfa: alfaVista,
+        alfa: alfaVista * nitido,
       });
     });
     escribir(ctx, "Pagos sumados", m.derecha, m.abajo + 17, { alinear: "right", peso: 500, tamano: 11, color: colores.texto, alfa: alfaVista });

@@ -1442,6 +1442,13 @@ function crearGraficoCrecimiento(canvas, datosIniciales) {
         ctx.fill();
       } else {
         punto(ctx, extremo.x, extremo.y, alfaArco); // el dinero viajando en el tiempo
+        // En un paso de "Explícame", cuando el punto llega a su periodo, el saldo de ese periodo.
+        const destino = estado.visibles - 1;
+        const llegada = vista.construyendo || destino < 1 ? 0 : 1 - Math.min(Math.abs(vista.alcance - destino) * 4, 1);
+        if (llegada > 0.01) {
+          const k = modelo.periodos[destino];
+          burbuja(ctx, `${nombrePeriodo()} ${datos.numero(k)}: ${datos.dinero(saldoEn(k))}`, extremo.x, extremo.y - 12, alfaArco * llegada, colores.textoFuerte, colores.superficie);
+        }
       }
     }
     // Rótulos del arco: el factor (o "i = ?") arriba y la tasa adentro. Aparecen cuando el arco
@@ -1563,6 +1570,11 @@ function crearGraficoCrecimiento(canvas, datosIniciales) {
   // (o la meta, cuando la incógnita es el tiempo).
   function leerPorDefecto() {
     if (enDiagrama()) {
+      // En un paso de "Explícame" que va por un periodo intermedio, la lectura es la de ese periodo.
+      if (estado.visibles > 1 && estado.visibles < modelo.total) {
+        datos.alLeer(lecturaDe(modelo.periodos[estado.visibles - 1]));
+        return;
+      }
       const unidad = Math.abs(modelo.n - 1) < 1e-9 ? datos.singular : datos.plural;
       datos.alLeer(`Hoy ${datos.dinero(modelo.P)} → ${datos.dinero(modelo.VF)} en ${datos.numero(modelo.n)} ${unidad}`);
       return;

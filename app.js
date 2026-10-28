@@ -588,6 +588,7 @@ function prepararTarjetaGrafico(tipo, { titulo = null, meta = false } = {}) {
   }
   ui.lienzo.hidden = tipo === "cadena";
   ui.visualHTML.hidden = tipo !== "cadena";
+  ui.tarjetaGrafico.classList.toggle("grafico--cadena", tipo === "cadena"); // en "Explícame", el panel queda fijo abajo
   mostrarVistaGrafico(vista);
 }
 
@@ -618,6 +619,13 @@ function elegirTipoGrafico(valor) {
   }
   mostrarVistaGrafico(valor, true);
   grafico?.cambiarTipo(valor);
+  // Con "Explícame" abierto, los pasos pasan a hablar de la vista nueva (desde el mismo paso).
+  if (explicacion && resultadoActual) {
+    explicacion.pasos = resultadoActual.explicacion(grafico, valor);
+    explicacion.indice = Math.min(explicacion.indice, explicacion.pasos.length - 1);
+    ui.puntos.innerHTML = explicacion.pasos.map(() => "<span></span>").join("");
+    mostrarPasoExplicame();
+  }
 }
 
 // Entrada del inicio: título y tarjetas aparecen escalonados.
@@ -978,7 +986,7 @@ function pasoTasa(r) {
   return { titulo, lineas };
 }
 
-const pasoFormula = (numero, html) => ({ titulo: "Fórmula de la hoja de clase", lineas: [`${insignia(numero)}${formula(html)}`] });
+const pasoFormula = (numero, html) => ({ titulo: "Fórmula", lineas: [`${insignia(numero)}${formula(html)}`] });
 
 // Sustitución paso a paso: una línea por cada operación, hasta el resultado.
 const pasoNumeros = (lineas) => ({ titulo: "Con los números", lineas: lineas.map((linea) => formula(linea)) });
@@ -1026,10 +1034,10 @@ function presentar(r) {
       extras: [["Intereses ganados", pesos(F - P)], ["Tasa usada", tasaUsada]],
       interpretacion: `Si inviertes ${pesos(P)} hoy a una tasa de ${porcentaje(i)} ${p.nombreTasa}, ${momentoFinal(n, m)} tendrás ${pesos(F)}.`,
       numeroFormula: "2.1",
-      explicacion: (g) =>
-        explicacionValorFuturo(r, g, {
+      explicacion: (g, vista) =>
+        explicacionValorFuturo(r, g, vista, {
           formula: `${FORMULAS.F} = ${conNumeros}`,
-          voz: `Eso es la fórmula 2.1 de la hoja de clase: el valor futuro es igual al valor presente por uno más i, elevado a la n. Con los números: ${cifra(P)} por ${base} elevado a la ${exponente(n)}, que da ${pesos(F)}.`,
+          voz: `El valor futuro es igual al valor presente por uno más i, elevado a la n. Con los números: ${cifra(P)} por ${base} elevado a la ${exponente(n)}, que da ${pesos(F)}.`,
         }),
     };
   }
@@ -1054,17 +1062,11 @@ function presentar(r) {
       extras: [["Intereses", pesos(F - P)], ["Tasa usada", tasaUsada]],
       interpretacion: `Para tener ${pesos(F)} ${momentoFinal(n, m)} a una tasa de ${porcentaje(i)} ${p.nombreTasa}, hoy debes invertir ${pesos(P)}.`,
       numeroFormula: "2.2",
-      explicacion: () => [
-        { texto: `La meta es tener ${pesos(F)} ${momentoFinal(n, m)}: es el valor futuro (F).`, vista: { enfoque: "final" } },
-        { texto: `El valor presente es lo que hay que invertir hoy para llegar a esa meta: ${pesos(P)}.`, vista: { enfoque: "capital" } },
-        { texto: `La diferencia, ${pesos(F - P)}, la ponen los intereses.`, vista: { enfoque: "intereses", notas: "comparar" } },
-        {
-          texto: "Eso es la fórmula 2.2 de la hoja de clase:",
+      explicacion: (g, vista) =>
+        explicacionValorPresente(r, vista, {
           formula: `${FORMULAS.P} = ${conNumeros}`,
-          voz: `Eso es la fórmula 2.2 de la hoja de clase: el valor presente es igual al valor futuro dividido entre uno más i, elevado a la n. Con los números: ${cifra(F)} entre ${base} elevado a la ${exponente(n)}, que da ${pesos(P)}.`,
-          vista: { enfoque: "todo" },
-        },
-      ],
+          voz: `El valor presente es igual al valor futuro dividido entre uno más i, elevado a la n. Con los números: ${cifra(F)} entre ${base} elevado a la ${exponente(n)}, que da ${pesos(P)}.`,
+        }),
     };
   }
 
@@ -1100,20 +1102,11 @@ function presentar(r) {
       extras: [["Efectiva anual", porcentaje(anual)], ["Intereses", pesos(F - P)]],
       interpretacion: `Para que ${pesos(P)} se conviertan en ${pesos(F)} en ${describirTiempo(n, m)}, se necesita una tasa de ${porcentaje(i)} ${p.nombreTasa}.`,
       numeroFormula: "2.3",
-      explicacion: () => [
-        { texto: `Empiezas con ${pesos(P)}: el valor presente (P).`, vista: { visibles: 1, enfoque: "capital" } },
-        { texto: `La meta es llegar a ${pesos(F)} (F) ${momentoFinal(n, m)}.`, vista: { enfoque: "final" } },
-        {
-          texto: `La tasa que logra ese crecimiento es ${porcentaje(i)} ${p.nombreTasa}${m !== 1 ? `, que equivale a ${porcentaje(anual)} efectiva anual` : ""}.`,
-          vista: { enfoque: "intereses", notas: "comparar" },
-        },
-        {
-          texto: "Eso es la fórmula 2.3 de la hoja de clase:",
+      explicacion: (g, vista) =>
+        explicacionTasa(r, vista, anual, {
           formula: `${FORMULAS.i} = ${conNumeros}`,
-          voz: `Eso es la fórmula 2.3 de la hoja de clase: la tasa es igual a la raíz de índice n del valor futuro entre el valor presente, menos uno. Con los números: raíz de índice ${exponente(n)} de ${cifra(F)} entre ${cifra(P)}, menos uno, que da ${porcentaje(i)} ${p.nombreTasa}.`,
-          vista: { enfoque: "todo" },
-        },
-      ],
+          voz: `La tasa es igual a la raíz de índice n del valor futuro entre el valor presente, menos uno. Con los números: raíz de índice ${exponente(n)} de ${cifra(F)} entre ${cifra(P)}, menos uno, que da ${porcentaje(i)} ${p.nombreTasa}.`,
+        }),
     };
   }
 
@@ -1142,23 +1135,37 @@ function presentar(r) {
   if (m !== 1) lineas.push(`En años: ${formatoDos.format(n / m)} años.`);
   pasos.push({ titulo: "Interpretación", lineas });
 
-  const explicacionTiempo = (g) => {
+  // Cada paso dice lo que muestra la vista: en el diagrama, las flechas y el arco; en barras y
+  // en área, la línea punteada de la meta y dónde la cruza la curva.
+  const explicacionTiempo = (g, vista) => {
+    const partes = partesDeVista(vista);
+    const enFlujo = vista === "flujo";
     const lista = [
-      { texto: `Empiezas con ${pesos(P)} (P). La meta es llegar a ${pesos(F)} (F).`, vista: { visibles: 1, enfoque: "capital" } },
+      {
+        texto: enFlujo
+          ? `Empiezas con ${pesos(P)}: el valor presente (VP), ${partes.hoy}. La meta es llegar a ${pesos(F)} (VF).`
+          : `Empiezas con ${pesos(P)} (P), ${partes.hoy}. La meta, ${pesos(F)} (F), es la línea punteada.`,
+        vista: { visibles: 1, enfoque: "capital" },
+      },
     ];
-    if (antes >= 1) {
-      lista.push({ texto: `${etiquetaAntes} tienes ${pesos(saldoAntes)}: todavía no llegas.`, vista: { visibles: g.barrasHasta(antes), enfoque: "todo" } });
+    // El último periodo que se ve antes de la meta (el gráfico agrupa los periodos si son muchos).
+    const visto = periodosDelGrafico(n, true).filter((k) => k <= antes + 1e-9).pop() ?? 0; // animaciones.js
+    if (visto >= 1) {
+      lista.push({
+        texto: `Al final del ${p.singular} ${cifra(visto)} tienes ${pesos(vfCompuesto(P, i, visto))}: ${enFlujo ? "todavía no llegas" : `${vista === "area" ? "la curva" : "la barra"} todavía no llega a la línea`}.`, // Hoja 2.1
+        vista: { visibles: g.barrasHasta(visto), enfoque: "todo" },
+      });
     }
     lista.push({
       texto: entero
-        ? `Llegas exactamente a la meta al final del ${p.singular} ${cifra(despues)}.`
-        : `La meta se alcanza en n = ${cantidadPeriodos(n)} ${p.plural}. Como el interés se suma cada ${p.singular}, la alcanzas al final del ${p.singular} ${cifra(despues)}, con ${pesos(saldoDespues)}.`,
+        ? `Llegas exactamente a la meta al final del ${p.singular} ${cifra(despues)}${enFlujo ? "" : ": la curva toca la línea"}.`
+        : `La meta se alcanza en n = ${cantidadPeriodos(n)} ${p.plural}${enFlujo ? "" : ", donde la curva cruza la línea"}. Como el interés se suma cada ${p.singular}, la alcanzas al final del ${p.singular} ${cifra(despues)}, con ${pesos(saldoDespues)}.`,
       vista: { enfoque: "meta" },
     });
     lista.push({
-      texto: "Eso es la fórmula 2.4 de la hoja de clase:",
+      texto: "Con la fórmula del tiempo:",
       formula: `${FORMULAS.n} = ${conNumeros}`,
-      voz: `Eso es la fórmula 2.4 de la hoja de clase: el tiempo es igual al logaritmo natural del valor futuro entre el valor presente, dividido entre el logaritmo natural de uno más i. Con los números da ${describirTiempo(n, m)}.`,
+      voz: `El tiempo es igual al logaritmo natural del valor futuro entre el valor presente, dividido entre el logaritmo natural de uno más i. Con los números da ${describirTiempo(n, m)}.`,
       vista: { enfoque: "todo" },
     });
     return lista;
@@ -1177,30 +1184,92 @@ function presentar(r) {
   };
 }
 
-// Pasos de "Explícame" para el valor futuro. pasoFormula: { formula (HTML), voz (para leer) }.
-function explicacionValorFuturo(r, g, pasoFormula) {
+// ----- "Explícame" de interés compuesto -----
+// Cada paso dice lo que muestra la vista del gráfico ("flujo", "barras" o "area"): en el
+// diagrama de flujo de caja, las flechas y el arco; en barras y en área, el capital y la parte
+// de intereses de cada periodo. pasoFormula: { formula (HTML), voz (para leer) }.
+
+// Cómo se llama cada parte del gráfico en esa vista.
+function partesDeVista(vista) {
+  if (vista === "flujo") return { p: "VP", f: "VF", hoy: "la flecha que sale en el periodo 0", final: "la flecha que llega al final", intereses: "el arco" };
+  if (vista === "area") return { p: "P", f: "F", hoy: "el punto de partida de la curva", final: "la altura de la curva al final", intereses: "la banda ámbar" };
+  return { p: "P", f: "F", hoy: "la primera barra", final: "la última barra", intereses: "la parte ámbar de cada barra" };
+}
+
+function explicacionValorFuturo(r, g, vista, pasoFormula) {
   const { P, F, i, n, m, p } = r;
-  const lista = [
-    { texto: `Hoy tienes ${pesos(P)}: es el valor presente (P).`, vista: { visibles: 1, enfoque: "capital" } },
-    {
-      texto: `Cada ${p.singular} el saldo gana ${porcentaje(i)} sobre todo lo acumulado. En el primer ${p.singular} gana ${pesos(vfCompuesto(P, i, 1) - P)}.`,
-      vista: { visibles: Math.min(4, g.total), enfoque: "todo", notas: "primero" },
-    },
-  ];
-  const ultimoEntero = Math.floor(n + 1e-9);
-  if (ultimoEntero >= 2) {
-    const interesDelUltimo = vfCompuesto(P, i, ultimoEntero) - vfCompuesto(P, i, ultimoEntero - 1); // Hoja 2.1
+  const partes = partesDeVista(vista);
+  const periodos = periodosDelGrafico(n, false); // los que dibuja el gráfico (animaciones.js)
+  const k1 = periodos[1] ?? 1; // el primer periodo después de hoy
+  const interesEn = (k) => vfCompuesto(P, i, k) - vfCompuesto(P, i, k - 1); // Hoja 2.1
+  const enElPeriodo = (k) => (k === 1 ? `el primer ${p.singular}` : `el ${p.singular} ${cifra(k)}`);
+  const delPeriodo = (k) => (k === 1 ? `del primer ${p.singular}` : `del ${p.singular} ${cifra(k)}`);
+  const lista = [{ texto: `Hoy tienes ${pesos(P)}: el valor presente (${partes.p}), ${partes.hoy}.`, vista: { visibles: 1, enfoque: "capital" } }];
+  if (vista === "flujo") {
+    const multiplica = vfCompuesto(1, i, n); // (1 + i)^n
     lista.push({
-      texto: `Los intereses crecen cada ${p.singular} porque también se ganan sobre los intereses anteriores: en el ${p.singular} ${cifra(ultimoEntero)} ya gana ${pesos(interesDelUltimo)}. Eso es el interés compuesto.`,
-      vista: { enfoque: "intereses", notas: "comparar" },
+      texto: `El arco lleva ese dinero en el tiempo: cada ${p.singular} se multiplica por ${decimal(1 + i)}. Al final ${delPeriodo(k1)} ya son ${pesos(vfCompuesto(P, i, k1))}.`,
+      vista: { visibles: 2, enfoque: "intereses" },
     });
+    lista.push({
+      texto: `En ${describirTiempo(n, m)}, el arco multiplica el dinero por ${decimal(1 + i)} elevado a ${exponente(n)}: por ${formatoDos.format(multiplica)}. Si solo se ganara interés sobre los ${pesos(P)} iniciales, sería por ${formatoDos.format(1 + i * n)}: lo de más son intereses ganados sobre intereses. Eso es el interés compuesto.`,
+      vista: { enfoque: "intereses" },
+    });
+  } else {
+    lista.push({
+      texto: `Cada ${p.singular} el saldo gana ${porcentaje(i)} sobre todo lo acumulado: ${partes.intereses} son los intereses. En ${enElPeriodo(k1)} se ganan ${pesos(interesEn(k1))}.`,
+      vista: { visibles: Math.min(2, g.total), enfoque: "todo", notas: "primero" },
+    });
+    const enteros = periodos.filter((k) => Number.isInteger(k));
+    const ultimo = enteros[enteros.length - 1];
+    if (enteros.length > 2) {
+      lista.push({
+        texto: `Los intereses crecen cada ${p.singular}, porque también se ganan sobre los intereses anteriores: en el ${p.singular} ${cifra(ultimo)} ya se ganan ${pesos(interesEn(ultimo))}. Eso es el interés compuesto.`,
+        vista: { enfoque: "intereses", notas: "comparar" },
+      });
+    }
   }
   lista.push({
-    texto: `${mayuscula(momentoFinal(n, m))} tienes ${pesos(F)}: el valor futuro (F). Los intereses suman ${pesos(F - P)}.`,
+    texto: `${mayuscula(momentoFinal(n, m))} tienes ${pesos(F)}: el valor futuro (${partes.f}), ${partes.final}. Los intereses suman ${pesos(F - P)}.`,
     vista: { enfoque: "final" },
   });
-  lista.push({ texto: "Eso es la fórmula 2.1 de la hoja de clase:", ...pasoFormula, vista: { enfoque: "todo" } });
+  lista.push({ texto: "Con la fórmula del valor futuro:", ...pasoFormula, vista: { enfoque: "todo" } });
   return lista;
+}
+
+function explicacionValorPresente(r, vista, pasoFormula) {
+  const { P, F, i, n, m, p } = r;
+  const partes = partesDeVista(vista);
+  const lista = [{ texto: `La meta es tener ${pesos(F)} ${momentoFinal(n, m)}: el valor futuro (${partes.f}), ${partes.final}.`, vista: { enfoque: "final" } }];
+  if (vista === "flujo") {
+    lista.push({ texto: `El arco trae ese dinero hacia hoy: por cada ${p.singular} de espera se divide entre ${decimal(1 + i)}. Eso es descontar.`, vista: { enfoque: "intereses" } });
+    lista.push({ texto: `Hoy hay que invertir ${pesos(P)}: el valor presente (VP), ${partes.hoy}. La diferencia, ${pesos(F - P)}, la ponen los intereses.`, vista: { enfoque: "capital" } });
+  } else {
+    lista.push({
+      texto: `El valor presente es lo que hay que invertir hoy para llegar a esa meta: ${pesos(P)}, ${vista === "area" ? "la banda de abajo" : "la parte de capital de cada barra"}.`,
+      vista: { enfoque: "capital" },
+    });
+    lista.push({ texto: `La diferencia, ${pesos(F - P)}, la ponen los intereses: ${partes.intereses}, que crece cada ${p.singular}.`, vista: { enfoque: "intereses", notas: "comparar" } });
+  }
+  lista.push({ texto: "Con la fórmula del valor presente:", ...pasoFormula, vista: { enfoque: "todo" } });
+  return lista;
+}
+
+function explicacionTasa(r, vista, anual, pasoFormula) {
+  const { P, F, i, n, m, p } = r;
+  const partes = partesDeVista(vista);
+  const equivale = m !== 1 ? `, que equivale a ${porcentaje(anual)} efectiva anual` : "";
+  return [
+    { texto: `Empiezas con ${pesos(P)}: el valor presente (${partes.p}), ${partes.hoy}.`, vista: { visibles: 1, enfoque: "capital" } },
+    { texto: `La meta es llegar a ${pesos(F)} ${momentoFinal(n, m)}: el valor futuro (${partes.f}), ${partes.final}.`, vista: { enfoque: "final" } },
+    vista === "flujo"
+      ? { texto: `Para que el arco lleve ${pesos(P)} hasta ${pesos(F)} hace falta una tasa de ${porcentaje(i)} ${p.nombreTasa}${equivale}.`, vista: { enfoque: "intereses" } }
+      : {
+          texto: `La tasa que logra ese crecimiento es ${porcentaje(i)} ${p.nombreTasa}${equivale}. Los intereses que produce son ${partes.intereses}.`,
+          vista: { enfoque: "intereses", notas: "comparar" },
+        },
+    { texto: "Con la fórmula de la tasa:", ...pasoFormula, vista: { enfoque: "todo" } },
+  ];
 }
 
 // enVivo: llega del deslizador de "¿Y si…?" (muchas veces por segundo). El número se escribe
@@ -1401,7 +1470,7 @@ function alternarDetalle() {
 async function copiarResultado() {
   if (!resultadoActual) return;
   const v = resultadoActual;
-  const fuente = v.fuente || `Fórmula ${v.numeroFormula} de la hoja de clase.`; // con varias fórmulas, el módulo trae la suya
+  const fuente = v.fuente || `Fórmula ${v.numeroFormula}.`; // con varias fórmulas, el módulo trae la suya
   const texto = `${v.etiqueta}: ${v.formatear(v.valor)} (${v.momento}).\n${v.interpretacion}\n${fuente}`;
   try {
     await navigator.clipboard.writeText(texto);
@@ -1435,7 +1504,7 @@ async function copiarResultado() {
 
 function abrirExplicame() {
   if (!resultadoActual || !grafico) return;
-  explicacion = { pasos: resultadoActual.explicacion(grafico), indice: 0 };
+  explicacion = { pasos: resultadoActual.explicacion(grafico, vistaGuardada(tipoVisual)), indice: 0 };
   ui.puntos.innerHTML = explicacion.pasos.map(() => "<span></span>").join("");
   ui.explicame.hidden = false;
   ui.accionesGrafico.hidden = true;
@@ -1444,7 +1513,27 @@ function abrirExplicame() {
   // Si la última vez se escuchó, vuelve a hablar sola (este toque permite que suene).
   if (narrador?.tieneVoz() && preferenciaVoz()) encenderVoz();
   ui.siguiente.focus({ preventScroll: true });
-  ui.explicame.scrollIntoView({ behavior: movimientoReducido() ? "auto" : "smooth", block: "nearest" });
+}
+
+// Que se vean juntos el gráfico y la explicación: lo justo para que el panel quede sobre la barra
+// inferior, sin que el gráfico se salga por arriba (si no caben los dos, manda el gráfico).
+function encuadrarExplicame() {
+  const arriba = barraSuperior.offsetHeight + 8;
+  const abajo = innerHeight - document.querySelector(".barra-inferior").offsetHeight - 8;
+  const suave = movimientoReducido() ? "auto" : "smooth";
+  if (ui.lienzo.hidden) {
+    // Cadenas (conversión e indexadas): el panel queda fijo abajo (CSS) y se trae a la vista el
+    // paso resaltado, sin que lo tape el panel.
+    const nodo = (ui.visualHTML.querySelector(".cadena__nodo--resaltado") || ui.visualHTML).getBoundingClientRect();
+    const libre = abajo - ui.explicame.offsetHeight - 8;
+    if (nodo.top < arriba || nodo.bottom > libre) window.scrollTo({ top: Math.max(0, scrollY + nodo.top - arriba), behavior: suave });
+    return;
+  }
+  const visual = ui.lienzo;
+  const hastaElGrafico = alturaEnPagina(visual) - arriba; // más abajo de esto, el gráfico se sale
+  const hastaElPanel = alturaEnPagina(ui.explicame) + ui.explicame.offsetHeight - abajo; // menos, el panel queda tapado
+  const destino = Math.min(Math.max(scrollY, hastaElPanel), Math.max(hastaElGrafico, 0));
+  if (Math.abs(destino - scrollY) > 2) window.scrollTo({ top: destino, behavior: suave });
 }
 
 function mostrarPasoExplicame() {
@@ -1459,6 +1548,7 @@ function mostrarPasoExplicame() {
   ui.anterior.disabled = indice === 0;
   ui.siguiente.textContent = indice === pasos.length - 1 ? "Terminar" : "Siguiente";
   grafico.irA(paso.vista, 700);
+  encuadrarExplicame();
   if (vozEncendida) narrarPaso();
 }
 

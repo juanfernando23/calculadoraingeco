@@ -337,16 +337,16 @@ function textoDeConversion(paso) {
   const r = porcentaje(paso.valor);
   switch (paso.formula) {
     case "1.1":
-      return `Una tasa nominal se reparte entre los ${paso.m} periodos del año: ${e} entre ${paso.m} da ${r} ${p.nombreTasa} (fórmula 1.1).`;
+      return `Una tasa nominal se reparte entre los ${paso.m} periodos del año: ${e} entre ${paso.m} da ${r} ${p.nombreTasa}.`;
     case "3.2":
-      return `Una tasa anticipada se pasa a vencida: ${e} entre (1 menos ${e}) da ${r} (fórmula 3.2). Es mayor, porque el interés anticipado se cobra al inicio.`;
+      return `Una tasa anticipada se pasa a vencida: ${e} entre (1 menos ${e}) da ${r}. Es mayor, porque el interés anticipado se cobra al inicio.`;
     case "1.5":
-      return `Con la tasa de cada ${p.singular} se capitaliza todo el año: (1 + ${e}) elevado a ${paso.m}, menos 1, da ${r} efectiva anual (fórmula 1.5). Es más que ${paso.m} veces la tasa, porque los intereses también ganan intereses.`;
+      return `Con la tasa de cada ${p.singular} se capitaliza todo el año: (1 + ${e}) elevado a ${paso.m}, menos 1, da ${r} efectiva anual. Es más que ${paso.m} veces la tasa, porque los intereses también ganan intereses.`;
     case "1.6":
-      return `De la efectiva anual se saca la tasa de cada ${p.singular}: (1 + ${e}) elevado a 1/${paso.m}, menos 1, da ${r} ${p.nombreTasa} (fórmula 1.6).`;
+      return `De la efectiva anual se saca la tasa de cada ${p.singular}: (1 + ${e}) elevado a 1/${paso.m}, menos 1, da ${r} ${p.nombreTasa}.`;
     case "3.1":
-      return `Para expresarla anticipada: ${e} entre (1 + ${e}) da ${r} (fórmula 3.1). Es menor, porque se cobra un periodo antes.`;
+      return `Para expresarla anticipada: ${e} entre (1 + ${e}) da ${r}. Es menor, porque se cobra un periodo antes.`;
     default:
-      return `Como nominal anual se multiplica por los ${paso.m} periodos: ${e} por ${paso.m} da ${r} (fórmula 1.2).`;
+      return `Como nominal anual se multiplica por los ${paso.m} periodos: ${e} por ${paso.m} da ${r}.`;
   }
 }

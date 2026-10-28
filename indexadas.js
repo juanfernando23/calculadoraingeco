@@ -225,7 +225,7 @@
       interpretacion,
       pasos,
       numeroFormula: r.combinada ? "4.1" : "4.2",
-      fuente: `Fórmulas ${listaDeFormulas(unicas)} de la hoja de clase.`,
+      fuente: `Fórmulas ${listaDeFormulas(unicas)}.`,
       resumen: `${nombre} ${deIndice} + ${porcentaje(r.puntos)} puntos`,
       visual: { tipo: "cadena", titulo: "Cómo se arma la tasa", descripcion: `Pasos para indexar ${nombreDe(nombre)}`, datos: { nodos, lectura: interpretacion } },
       explicacion: () => explicar(r, nodos),
@@ -239,11 +239,11 @@
     if (nombre === "DTF") {
       texto =
         r.forma === "EA"
-          ? `La DTF viene en efectiva anual, pero los puntos se pactan sobre trimestre anticipado. Solo se suman tasas de la misma forma (fórmula 4.2): primero se convierte la DTF.`
-          : `La DTF ya viene en trimestre anticipado, la misma forma de los puntos: se pueden sumar directo (fórmula 4.2).`;
-    } else if (nombre === "IBR") texto = `El IBR a ${r.plazo === 12 ? "1 mes viene nominal mes vencido" : "3 meses viene nominal trimestre vencido"}, la misma forma de los puntos: se suman directo (fórmula 4.2).`;
-    else if (nombre === "IPC") texto = "El IPC es la inflación de los últimos 12 meses, en efectiva anual. Con los puntos no se suma: se combina (fórmula 4.1).";
-    else texto = "La variación de la UVR sigue a la inflación. Como el IPC, se combina con los puntos (fórmula 4.1).";
+          ? `La DTF viene en efectiva anual, pero los puntos se pactan sobre trimestre anticipado. Solo se suman tasas de la misma forma: primero se convierte la DTF.`
+          : `La DTF ya viene en trimestre anticipado, la misma forma de los puntos: se pueden sumar directo.`;
+    } else if (nombre === "IBR") texto = `El IBR a ${r.plazo === 12 ? "1 mes viene nominal mes vencido" : "3 meses viene nominal trimestre vencido"}, la misma forma de los puntos: se suman directo.`;
+    else if (nombre === "IPC") texto = "El IPC es la inflación de los últimos 12 meses, en efectiva anual. Con los puntos no se suma: se combina.";
+    else texto = "La variación de la UVR sigue a la inflación. Como el IPC, se combina con los puntos.";
     pasos.push({ texto, vista: { paso: 0 } });
     nodos.forEach((nodo, k) => {
       if (k === 0 || nodo.tipo === "resultado") return;
@@ -251,10 +251,10 @@
         const paso = [...(r.previa?.pasos || []), ...r.aAnual.pasos, ...(r.aDestino?.pasos || [])].find((otro) => expresionConversion(otro) === nodo.expresion);
         pasos.push({ texto: paso ? textoDeConversion(paso) : nodo.nombre, vista: { paso: k } });
       } else if (nodo.tipo === "suma") {
-        pasos.push({ texto: `Ahora sí se suman (fórmula 4.2): ${porcentaje(r.indiceSumado)} más ${porcentaje(r.puntos)} da ${porcentaje(r.tasa.valor)} ${describirForma(r.tasa)}.`, vista: { paso: k } });
+        pasos.push({ texto: `Ahora sí se suman: ${porcentaje(r.indiceSumado)} más ${porcentaje(r.puntos)} da ${porcentaje(r.tasa.valor)} ${describirForma(r.tasa)}.`, vista: { paso: k } });
       } else {
         pasos.push({
-          texto: `(1 + ${porcentaje(r.valor)}) por (1 + ${porcentaje(r.puntos)}), menos 1, da ${porcentaje(r.tasa.valor)} (fórmula 4.1). Es más que la suma, ${porcentaje(r.lineal)}: la esquina del cuadro es el interés del interés, ${porcentaje(r.tasa.valor - r.lineal)}.`,
+          texto: `(1 + ${porcentaje(r.valor)}) por (1 + ${porcentaje(r.puntos)}), menos 1, da ${porcentaje(r.tasa.valor)}. Es más que la suma, ${porcentaje(r.lineal)}: la esquina del cuadro es el interés del interés, ${porcentaje(r.tasa.valor - r.lineal)}.`,
           vista: { paso: k },
         });
       }
@@ -383,7 +383,7 @@
       if (sentido === 0) return `Mueve el control: ¿cuánto cambia la tasa efectiva anual con ${variable === "puntos" ? "más o menos puntos" : `otro valor de ${nombreDe(r.indice)}`}?`;
       const cambio = `${sentido > 0 ? "sube" : "baja"} ${formatoDos.format(Math.abs(r.ea - o.ea) * 100)} puntos`;
       if (r.combinada) return `La efectiva anual ${cambio}: el índice y los puntos se combinan, así que además de sumarse, cada uno gana sobre el otro (el interés del interés).`;
-      return `La efectiva anual ${cambio}: la suma es lineal (4.2), pero al pasar a efectiva anual los intereses se capitalizan dentro del año.`;
+      return `La efectiva anual ${cambio}: la suma es lineal, pero al pasar a efectiva anual los intereses se capitalizan dentro del año.`;
     },
     nota: (r) => `Tasa indexada: ${porcentaje(r.tasa.valor)} ${describirForma(r.tasa)}.`,
   };
