@@ -714,6 +714,10 @@ a.modulo:hover .modulo__flecha { transform: translateX(calc(3px * var(--mov))); 
 
 .selector select:focus-visible { outline: none; border-color: var(--primario); box-shadow: inset 0 0 0 1px var(--primario), 0 0 0 4px var(--primario-suave); }
 
+/* Fijo (la efectiva anual siempre es anual): se lee, pero no se despliega */
+.selector select:disabled { background: var(--superficie-2); color: var(--texto-2); opacity: 1; cursor: default; }
+.selector:has(select:disabled) .selector__flecha { opacity: 0; }
+
 .selector__flecha {
   position: absolute;
   top: 50%;
@@ -843,6 +847,7 @@ a.modulo:hover .modulo__flecha { transform: translateX(calc(3px * var(--mov))); 
 .resultado--entrando .tarjeta { animation: revelar var(--dur-entrada) var(--ease-entrar) both; }
 .resultado--entrando .tarjeta:nth-of-type(2) { animation-delay: 110ms; }
 .resultado--entrando .tarjeta:nth-of-type(3) { animation-delay: 220ms; }
+.resultado--entrando .tarjeta:nth-of-type(4) { animation-delay: 300ms; }
 .resultado--entrando .resultado__datos > div { animation: aparecer var(--dur-entrada) var(--ease-entrar) both; }
 .resultado--entrando .resultado__datos > div:nth-child(1) { animation-delay: 260ms; }
 .resultado--entrando .resultado__datos > div:nth-child(2) { animation-delay: 330ms; }
@@ -911,11 +916,11 @@ a.modulo:hover .modulo__flecha { transform: translateX(calc(3px * var(--mov))); 
 
 .resultado__momento { color: var(--primario); font-size: 15px; font-weight: 600; }
 
+/* Datos extra, interpretación y acciones: en su propia tarjeta, después del gráfico */
 .resultado__datos {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  margin-top: 16px;
 }
 
 .resultado__datos > div { padding: 10px 12px; border-radius: 12px; background: var(--superficie-2); min-width: 0; }
@@ -986,6 +991,114 @@ a.modulo:hover .modulo__flecha { transform: translateX(calc(3px * var(--mov))); 
 }
 
 .grafico__pista { margin-top: 6px; color: var(--texto-3); font-size: 12.5px; }
+
+/* ===== Cadena de conversión (visuales.js): conversión de tasas y tasas indexadas ===== */
+
+/* La línea entre pasos crece de 0 a 1 al construirse (Web Animations sobre --linea). */
+@property --linea { syntax: "<number>"; inherits: false; initial-value: 1; }
+
+.visual { margin-top: 6px; }
+
+.cadena { list-style: none; margin: 0; padding: 0; display: grid; }
+
+.cadena__nodo {
+  position: relative;
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 12px;
+  padding: 8px 8px 14px 0;
+  border-radius: var(--radio);
+  transition: opacity var(--dur-transicion) var(--ease-mover), background-color var(--dur-transicion) var(--ease-mover);
+}
+
+/* Línea que baja de la marca de cada paso hasta la del siguiente */
+.cadena__nodo:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  top: 24px;
+  bottom: -12px;
+  left: 18px;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--borde);
+  transform: scaleY(var(--linea));
+  transform-origin: top;
+}
+
+.cadena__marca {
+  position: relative;
+  z-index: 1;
+  justify-self: center;
+  width: 16px;
+  height: 16px;
+  margin-top: 4px;
+  border: 3px solid var(--superficie);
+  border-radius: 50%;
+  background: var(--grafico-capital);
+  box-shadow: 0 0 0 1.5px var(--grafico-capital);
+}
+
+.cadena__marca--formula {
+  width: auto;
+  min-width: 38px;
+  height: 26px;
+  margin-top: 0;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 13px;
+  background: var(--primario-suave);
+  box-shadow: none;
+  color: var(--primario-fuerte);
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 26px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.cadena__nodo--resultado .cadena__marca { background: var(--primario-fuerte); box-shadow: 0 0 0 1.5px var(--primario-fuerte); }
+.cadena__nodo--resultado { background: var(--primario-suave); padding-top: 10px; }
+.cadena__nodo--resultado .cadena__valor { color: var(--primario-fuerte); font-size: 17px; }
+
+.cadena__etiqueta { color: var(--texto-3); font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+.cadena__nombre { color: var(--texto-2); font-size: 13.5px; font-weight: 600; }
+.cadena__expresion { margin-top: 2px; font-size: 14px; }
+.cadena__valor { margin-top: 2px; font-size: 15.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.cadena__nota { margin-top: 4px; color: var(--texto-2); font-size: 13px; }
+
+/* Explícame: el paso del momento se ve; los demás se atenúan */
+.cadena__nodo--atenuado { opacity: 0.32; }
+.cadena__nodo--resaltado { background: var(--superficie-2); }
+.cadena__nodo--resultado.cadena__nodo--resaltado { background: var(--primario-suave); }
+
+/* Suma (4.2): el índice y los puntos, con largo proporcional, pegados en una sola barra */
+.cadena__suma { margin: 6px 0 4px; }
+.cadena__barra { display: flex; gap: 2px; height: 14px; }
+.cadena__bloque { flex: var(--parte) 1 0; min-width: 8px; border-radius: 4px; background: var(--grafico-capital); transition: flex-grow 220ms var(--ease-mover); }
+.cadena__bloque--1 { background: var(--grafico-interes); }
+.cadena__partes { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; margin-top: 4px; color: var(--texto-2); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.cadena__parte strong { color: var(--texto); }
+.cadena__parte--0::before, .cadena__parte--1::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 5px; border-radius: 2px; background: var(--grafico-capital); }
+.cadena__parte--1::before { background: var(--grafico-interes); }
+.cadena__mas { color: var(--texto-3); font-weight: 700; }
+
+/* Combinada (4.1): (1 + a)(1 + b) = 1 + a + b + a·b; la esquina a·b es lo que no tiene la suma */
+.cadena__cuadro {
+  display: grid;
+  grid-template-columns: 1fr 34%;
+  grid-template-rows: 46px 34px;
+  gap: 2px;
+  width: min(190px, 100%);
+  margin: 8px 0 4px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.cadena__celda { display: grid; place-items: center; border-radius: 4px; color: var(--texto); }
+.cadena__celda--uno { background: var(--superficie-2); color: var(--texto-2); }
+.cadena__celda--a { background: color-mix(in srgb, var(--grafico-capital) 32%, transparent); }
+.cadena__celda--b { background: color-mix(in srgb, var(--grafico-capital) 32%, transparent); }
+.cadena__celda--cruce { background: var(--grafico-interes); color: var(--superficie); }
 
 /* Con "¿Y si…?" abierto, el gráfico y el panel caben juntos en la pantalla del celular. */
 .grafico--ysi .grafico__leyenda,
@@ -1466,3 +1579,78 @@ a.modulo:hover .modulo__flecha { transform: translateX(calc(3px * var(--mov))); 
 .glosario__item { padding: 14px 16px; border-radius: var(--radio); background: var(--superficie); box-shadow: var(--sombra); }
 .glosario__item dt { font-weight: 600; }
 .glosario__item dd { margin-top: 2px; color: var(--texto-2); font-size: 14.5px; }
+
+/* ===================== Módulos nuevos ===================== */
+
+/* Transiciones de las tarjetas del inicio a los encabezados: el nombre va en el HTML de cada una. */
+html[data-movimiento="reducido"] .vt { view-transition-name: none !important; }
+
+.nota-indice { margin-top: 10px; }
+.nota-indice:empty { display: none; }
+
+/* ===================== Usar una tasa en otro módulo ===================== */
+
+.usar-tasa { margin-top: 12px; padding: 12px; border-radius: 12px; background: var(--superficie-2); }
+.usar-tasa__titulo { color: var(--texto-2); font-size: 13.5px; }
+.usar-tasa__lista { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.usar-tasa__lista .boton { background: var(--superficie); }
+
+/* ===================== Ayuda: manual de uso ===================== */
+
+.manual { display: grid; gap: 8px; padding-left: 20px; }
+.texto .manual + p { margin-top: 12px; }
+
+/* ===================== Validación (validacion.js) ===================== */
+
+.validacion { scroll-margin-top: 72px; }
+.texto h3.validacion__parte { margin: 20px 0 4px; font-size: 15.5px; font-weight: 700; }
+
+.validacion__datos { display: grid; gap: 6px; margin: 12px 0; }
+.validacion__datos > div { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 10px; padding: 8px 12px; border-radius: 10px; background: var(--superficie-2); }
+.validacion__datos dt { color: var(--texto-3); font-size: 13px; font-weight: 600; }
+.validacion__datos dd { color: var(--texto-2); font-size: 14px; }
+.validacion__datos dd strong { color: var(--texto); font-variant-numeric: tabular-nums; }
+
+.desarrollo { margin-top: 12px; border-top: 1px solid var(--borde); border-bottom: 1px solid var(--borde); }
+.desarrollo summary { display: flex; align-items: center; justify-content: space-between; padding: 12px 2px; color: var(--primario); font-size: 15px; font-weight: 600; cursor: pointer; list-style: none; }
+.desarrollo summary::-webkit-details-marker { display: none; }
+.desarrollo summary::after { content: ""; width: 8px; height: 8px; margin-right: 4px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-2px) rotate(45deg); transition: transform var(--dur-transicion) var(--ease-mover); }
+.desarrollo[open] summary::after { transform: translateY(2px) rotate(-135deg); }
+.desarrollo .pasos { padding: 2px 0 14px; }
+.desarrollo[open] .pasos { animation: aparecer var(--dur-entrada) var(--ease-entrar) both; }
+
+.comparacion-validacion { display: grid; gap: 8px; margin-top: 14px; }
+.comparacion-validacion__fila { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px 10px; padding: 10px 12px; border-radius: 12px; background: var(--superficie-2); }
+.comparacion-validacion__fila dt { grid-column: 1 / -1; color: var(--texto-2); font-size: 13px; font-weight: 600; }
+.comparacion-validacion__fila dd { display: flex; flex-direction: column; min-width: 0; }
+.comparacion-validacion__fila dd span { color: var(--texto-3); font-size: 12px; }
+.comparacion-validacion__fila dd strong { font-size: 13.5px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.con-marca { display: inline-flex; align-items: center; gap: 6px; }
+
+.texto .validacion__veredicto { margin-top: 12px; padding: 10px 12px; border-left: 3px solid var(--exito); border-radius: 4px 12px 12px 4px; background: var(--superficie-2); font-size: 14.5px; }
+.texto .validacion__veredicto--no { border-left-color: var(--error); }
+
+.matriz { display: grid; gap: 8px; margin-top: 12px; padding: 0; list-style: none; }
+.matriz__fila { padding: 10px 12px; border-radius: 12px; background: var(--superficie-2); }
+.matriz__cabeza { display: grid; grid-template-columns: 28px minmax(0, 1fr) 22px; align-items: center; gap: 10px; }
+.matriz__numero { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: var(--primario-suave); color: var(--primario-fuerte); font-size: 12.5px; font-weight: 700; text-decoration: none; }
+.texto .matriz__nombre { color: var(--texto); font-size: 14.5px; font-weight: 600; line-height: 1.35; }
+.matriz__valores { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+.matriz__valores dt { color: var(--texto-3); font-size: 11.5px; font-weight: 600; }
+.matriz__valores dd { font-size: 13.5px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* En pantallas angostas, cada valor en su renglón: etiqueta a la izquierda y valor a la derecha. */
+@media (max-width: 379px) {
+  .matriz__valores, .comparacion-validacion__fila { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .matriz__valores > div, .comparacion-validacion__fila dd { display: flex; flex-direction: row; align-items: baseline; justify-content: space-between; gap: 8px; }
+}
+
+.marca-validado { flex: none; width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; background: var(--exito); color: var(--superficie); }
+.marca-validado .icono { width: 15px; height: 15px; stroke-width: 2.8; stroke-dasharray: 20; }
+.marca-validado--no { background: var(--error); }
+
+/* Al abrir la pantalla, las filas aparecen una tras otra y cada chulito se dibuja con un trazo. */
+.matriz--entrando .matriz__fila { animation: aparecer var(--dur-entrada) var(--ease-entrar) both; animation-delay: calc(var(--i) * 60ms); }
+.matriz--entrando .marca-validado .icono { animation: trazo 420ms var(--ease-entrar) both; animation-delay: calc(300ms + var(--i) * 90ms); }
+@keyframes trazo { from { stroke-dashoffset: 20; } }
+:root[data-movimiento="reducido"] .matriz--entrando .marca-validado .icono { animation: none; }

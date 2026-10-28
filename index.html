@@ -120,54 +120,54 @@
             </a>
           </li>
           <li style="--i: 1">
-            <div class="modulo modulo--pronto" aria-disabled="true">
-              <span class="modulo__icono"><svg class="icono" width="24" height="24"><use href="#i-conversion"/></svg></span>
+            <a class="modulo" href="#conversion-tasas">
+              <span class="modulo__icono vt" style="view-transition-name: icono-conversion"><svg class="icono" width="24" height="24"><use href="#i-conversion"/></svg></span>
               <span class="modulo__texto">
-                <span class="modulo__nombre">Conversión de tasas</span>
-                <span class="modulo__desc">Nominal, efectiva, vencida y anticipada</span>
+                <span class="modulo__nombre vt" style="view-transition-name: titulo-conversion">Conversión de tasas</span>
+                <span class="modulo__desc">Periódica, nominal y efectiva anual</span>
               </span>
-              <span class="etiqueta">Pronto</span>
-            </div>
+              <svg class="icono modulo__flecha" width="20" height="20"><use href="#i-adelante"/></svg>
+            </a>
           </li>
           <li style="--i: 2">
-            <div class="modulo modulo--pronto" aria-disabled="true">
-              <span class="modulo__icono"><svg class="icono" width="24" height="24"><use href="#i-indexadas"/></svg></span>
+            <a class="modulo" href="#tasas-indexadas">
+              <span class="modulo__icono vt" style="view-transition-name: icono-indexadas"><svg class="icono" width="24" height="24"><use href="#i-indexadas"/></svg></span>
               <span class="modulo__texto">
-                <span class="modulo__nombre">Tasas indexadas</span>
+                <span class="modulo__nombre vt" style="view-transition-name: titulo-indexadas">Tasas indexadas</span>
                 <span class="modulo__desc">DTF, IBR, IPC y UVR más puntos</span>
               </span>
-              <span class="etiqueta">Pronto</span>
-            </div>
+              <svg class="icono modulo__flecha" width="20" height="20"><use href="#i-adelante"/></svg>
+            </a>
           </li>
           <li style="--i: 3">
-            <div class="modulo modulo--pronto" aria-disabled="true">
-              <span class="modulo__icono"><svg class="icono" width="24" height="24"><use href="#i-vencida"/></svg></span>
+            <a class="modulo" href="#anualidad-vencida">
+              <span class="modulo__icono vt" style="view-transition-name: icono-vencida"><svg class="icono" width="24" height="24"><use href="#i-vencida"/></svg></span>
               <span class="modulo__texto">
-                <span class="modulo__nombre">Anualidad vencida</span>
+                <span class="modulo__nombre vt" style="view-transition-name: titulo-vencida">Anualidad vencida</span>
                 <span class="modulo__desc">Pagos al final de cada periodo</span>
               </span>
-              <span class="etiqueta">Pronto</span>
-            </div>
+              <svg class="icono modulo__flecha" width="20" height="20"><use href="#i-adelante"/></svg>
+            </a>
           </li>
           <li style="--i: 4">
-            <div class="modulo modulo--pronto" aria-disabled="true">
-              <span class="modulo__icono"><svg class="icono" width="24" height="24"><use href="#i-anticipada"/></svg></span>
+            <a class="modulo" href="#anualidad-anticipada">
+              <span class="modulo__icono vt" style="view-transition-name: icono-anticipada"><svg class="icono" width="24" height="24"><use href="#i-anticipada"/></svg></span>
               <span class="modulo__texto">
-                <span class="modulo__nombre">Anualidad anticipada</span>
+                <span class="modulo__nombre vt" style="view-transition-name: titulo-anticipada">Anualidad anticipada</span>
                 <span class="modulo__desc">Pagos al inicio de cada periodo</span>
               </span>
-              <span class="etiqueta">Pronto</span>
-            </div>
+              <svg class="icono modulo__flecha" width="20" height="20"><use href="#i-adelante"/></svg>
+            </a>
           </li>
           <li style="--i: 5">
-            <div class="modulo modulo--pronto" aria-disabled="true">
-              <span class="modulo__icono"><svg class="icono" width="24" height="24"><use href="#i-perpetua"/></svg></span>
+            <a class="modulo" href="#anualidad-perpetua">
+              <span class="modulo__icono vt" style="view-transition-name: icono-perpetua"><svg class="icono" width="24" height="24"><use href="#i-perpetua"/></svg></span>
               <span class="modulo__texto">
-                <span class="modulo__nombre">Anualidad perpetua</span>
+                <span class="modulo__nombre vt" style="view-transition-name: titulo-perpetua">Anualidad perpetua</span>
                 <span class="modulo__desc">Pagos que no terminan</span>
               </span>
-              <span class="etiqueta">Pronto</span>
-            </div>
+              <svg class="icono modulo__flecha" width="20" height="20"><use href="#i-adelante"/></svg>
+            </a>
           </li>
         </ul>
       </section>
@@ -254,10 +254,11 @@
                 <div class="opciones-tasa">
                   <div class="opciones-tasa__tipo">
                     <p class="control__etiqueta" id="etiqueta-tipo">Tipo</p>
-                    <div class="segmentado segmentado--compacto" data-segmentado style="--opciones: 2" role="radiogroup" aria-labelledby="etiqueta-tipo">
+                    <div class="segmentado segmentado--compacto" data-segmentado style="--opciones: 3" role="radiogroup" aria-labelledby="etiqueta-tipo">
                       <span class="segmentado__indicador" aria-hidden="true"></span>
-                      <label class="segmentado__opcion"><input type="radio" name="tipo-tasa" value="efectiva" checked>Efectiva</label>
-                      <label class="segmentado__opcion"><input type="radio" name="tipo-tasa" value="nominal">Nominal anual</label>
+                      <label class="segmentado__opcion"><input type="radio" name="tipo-tasa" value="periodica" checked>Periódica</label>
+                      <label class="segmentado__opcion"><input type="radio" name="tipo-tasa" value="nominal">Nominal</label>
+                      <label class="segmentado__opcion"><input type="radio" name="tipo-tasa" value="anual">Efectiva anual</label>
                     </div>
                   </div>
                   <div>
@@ -331,46 +332,26 @@
             Cambiaste los datos. Toca Calcular para actualizar el resultado.
           </p>
 
+          <!-- Arriba solo el número: así el diagrama cabe completo debajo, en la misma pantalla -->
           <div class="tarjeta tarjeta--resultado">
             <p class="resultado__etiqueta" id="resultado-etiqueta"></p>
             <p class="resultado__valor" id="resultado-valor"></p>
             <p class="resultado__momento" id="resultado-momento"></p>
-            <dl class="resultado__datos" id="resultado-extras"></dl>
-            <p class="resultado__interpretacion" id="resultado-interpretacion"></p>
-            <div class="resultado__acciones">
-              <button class="boton boton--chico" id="nuevo-calculo" type="button">Nuevo cálculo</button>
-              <button class="boton boton--chico" id="copiar-resultado" type="button">
-                <svg class="icono" width="18" height="18" aria-hidden="true"><use id="icono-copiar" href="#i-copiar"/></svg>
-                <span id="texto-copiar">Copiar resultado</span>
-              </button>
-            </div>
           </div>
 
           <div class="tarjeta grafico" id="tarjeta-grafico">
             <div class="grafico__encabezado">
               <div class="grafico__fila">
                 <p class="grafico__titulo" id="titulo-grafico">Flujo de caja</p>
-                <div class="segmentado segmentado--mini" data-segmentado style="--opciones: 3" role="radiogroup" aria-label="Tipo de gráfico">
-                  <span class="segmentado__indicador" aria-hidden="true"></span>
-                  <label class="segmentado__opcion"><input type="radio" name="tipo-grafico" value="flujo" checked><svg class="icono" width="16" height="16" aria-hidden="true"><use href="#i-flujo"/></svg>Flujo</label>
-                  <label class="segmentado__opcion"><input type="radio" name="tipo-grafico" value="barras"><svg class="icono" width="16" height="16" aria-hidden="true"><use href="#i-barras"/></svg>Barras</label>
-                  <label class="segmentado__opcion"><input type="radio" name="tipo-grafico" value="area"><svg class="icono" width="16" height="16" aria-hidden="true"><use href="#i-area"/></svg>Área</label>
-                </div>
+                <!-- Las vistas dependen del módulo: app.js arma las opciones -->
+                <div class="segmentado segmentado--mini" id="selector-vista" data-segmentado role="radiogroup" aria-label="Tipo de gráfico"></div>
               </div>
               <p class="grafico__lectura" id="grafico-lectura"></p>
             </div>
             <canvas class="grafico__lienzo" id="grafico-compuesto" role="img" tabindex="0"></canvas>
-            <div class="grafico__leyenda" id="leyenda-flujo">
-              <span class="leyenda-flecha leyenda-flecha--sale">Sale dinero (inversión)</span>
-              <span class="leyenda-flecha leyenda-flecha--entra">Entra dinero</span>
-              <span class="leyenda-flecha leyenda-flecha--interes">Interés compuesto</span>
-            </div>
-            <div class="grafico__leyenda" id="leyenda-crecimiento" hidden>
-              <span class="leyenda">Capital</span>
-              <span class="leyenda leyenda--interes">Intereses</span>
-              <span class="leyenda leyenda--meta" id="leyenda-meta" hidden>Meta</span>
-            </div>
-            <p class="grafico__pista" id="grafico-pista">Desliza el dedo sobre la línea de tiempo para ver cuánto vale ese dinero en cada periodo.</p>
+            <div class="visual" id="visual-html" hidden></div>
+            <div class="grafico__leyenda" id="grafico-leyenda"></div>
+            <p class="grafico__pista" id="grafico-pista"></p>
 
             <div class="grafico__acciones" id="grafico-acciones">
               <button class="boton-icono" id="repetir-grafico" type="button" aria-label="Repetir la animación" title="Repetir la animación">
@@ -445,6 +426,26 @@
             </div>
           </div>
 
+          <div class="tarjeta resumen">
+            <dl class="resultado__datos" id="resultado-extras"></dl>
+            <p class="resultado__interpretacion" id="resultado-interpretacion"></p>
+            <div class="resultado__acciones">
+              <button class="boton boton--chico" id="nuevo-calculo" type="button">Nuevo cálculo</button>
+              <button class="boton boton--chico" id="copiar-resultado" type="button">
+                <svg class="icono" width="18" height="18" aria-hidden="true"><use id="icono-copiar" href="#i-copiar"/></svg>
+                <span id="texto-copiar">Copiar resultado</span>
+              </button>
+              <button class="boton boton--chico" id="usar-tasa" type="button" aria-expanded="false" aria-controls="usar-tasa-opciones" hidden>
+                <svg class="icono" width="18" height="18" aria-hidden="true"><use href="#i-flecha"/></svg>
+                Usar esta tasa
+              </button>
+            </div>
+            <div class="usar-tasa" id="usar-tasa-opciones" hidden>
+              <p class="usar-tasa__titulo">¿En qué módulo? La tasa queda escrita con su tipo, periodo y modalidad.</p>
+              <div class="usar-tasa__lista" id="usar-tasa-lista"></div>
+            </div>
+          </div>
+
           <div class="tarjeta detalle">
             <button class="detalle__boton" id="detalle-boton" type="button" aria-expanded="false" aria-controls="detalle-contenido">
               ¿Cómo se calculó?
@@ -458,6 +459,468 @@
           </div>
         </section>
       </section>
+
+      <!-- ===================== Conversión de tasas ===================== -->
+      <section class="pantalla" id="pantalla-conversion-tasas" aria-labelledby="titulo-conversion" hidden>
+        <div class="encabezado">
+          <span class="encabezado__icono vt" style="view-transition-name: icono-conversion" aria-hidden="true"><svg class="icono" width="26" height="26"><use href="#i-conversion"/></svg></span>
+          <h1 class="encabezado__titulo vt" style="view-transition-name: titulo-conversion" id="titulo-conversion" data-titulo-grande>Conversión de tasas</h1>
+          <p class="encabezado__texto">Encuentra la tasa equivalente en otra forma: periódica, nominal o efectiva anual, de otro periodo, vencida o anticipada.</p>
+        </div>
+
+        <form id="form-conversion" novalidate autocomplete="off">
+          <div class="campo" data-campo="tasa">
+            <label class="campo__etiqueta" for="conversion-tasa">Tasa que tienes <span class="campo__simbolo">(i)</span></label>
+            <div class="entrada">
+              <input id="conversion-tasa" name="tasa" type="text" inputmode="decimal" enterkeyhint="done" placeholder="24">
+              <span class="entrada__adorno" aria-hidden="true">%</span>
+            </div>
+            <div data-tasa="tasa"></div>
+            <p class="campo__error" aria-live="polite"></p>
+          </div>
+
+          <fieldset class="bloque">
+            <legend class="bloque__titulo">Convertir a</legend>
+            <div data-tasa="destino"></div>
+            <button class="enlace" type="button" data-accion="ejemplo">Cargar un ejemplo</button>
+          </fieldset>
+
+          <p class="error-general" role="alert" hidden></p>
+          <div class="acciones">
+            <button class="boton boton--secundario" type="button" data-accion="limpiar">Limpiar</button>
+            <button class="boton boton--primario" type="submit">Calcular</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- ===================== Tasas indexadas ===================== -->
+      <section class="pantalla" id="pantalla-tasas-indexadas" aria-labelledby="titulo-indexadas" hidden>
+        <div class="encabezado">
+          <span class="encabezado__icono vt" style="view-transition-name: icono-indexadas" aria-hidden="true"><svg class="icono" width="26" height="26"><use href="#i-indexadas"/></svg></span>
+          <h1 class="encabezado__titulo vt" style="view-transition-name: titulo-indexadas" id="titulo-indexadas" data-titulo-grande>Tasas indexadas</h1>
+          <p class="encabezado__texto">Arma la tasa de un índice más sus puntos: la DTF y el IBR se suman (4.2); el IPC y la UVR se combinan (4.1).</p>
+        </div>
+
+        <form id="form-indexadas" novalidate autocomplete="off">
+          <fieldset class="bloque">
+            <legend class="bloque__titulo">¿Qué índice?</legend>
+            <div class="segmentado" data-segmentado style="--opciones: 4" role="radiogroup" aria-label="Índice">
+              <span class="segmentado__indicador" aria-hidden="true"></span>
+              <label class="segmentado__opcion"><input type="radio" name="indice" value="DTF" checked>DTF</label>
+              <label class="segmentado__opcion"><input type="radio" name="indice" value="IBR">IBR</label>
+              <label class="segmentado__opcion"><input type="radio" name="indice" value="IPC">IPC</label>
+              <label class="segmentado__opcion"><input type="radio" name="indice" value="UVR">UVR</label>
+            </div>
+            <p class="campo__ayuda nota-indice" data-nota-indice></p>
+            <button class="enlace" type="button" data-accion="ejemplo">Cargar un ejemplo</button>
+          </fieldset>
+
+          <div class="plegable" data-para="UVR">
+            <div class="plegable__interior">
+              <div class="campo">
+                <p class="campo__etiqueta" id="indexadas-etiqueta-operacion">¿Qué quieres calcular?</p>
+                <div class="segmentado segmentado--compacto" data-segmentado style="--opciones: 3" role="radiogroup" aria-labelledby="indexadas-etiqueta-operacion">
+                  <span class="segmentado__indicador" aria-hidden="true"></span>
+                  <label class="segmentado__opcion"><input type="radio" name="operacion" value="costo" checked>Costo en pesos</label>
+                  <label class="segmentado__opcion"><input type="radio" name="operacion" value="pesos">Pesos y UVR</label>
+                  <label class="segmentado__opcion"><input type="radio" name="operacion" value="variacion">Variación</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="plegable" data-para="DTF IBR IPC UVR-costo">
+            <div class="plegable__interior">
+              <div class="campo" data-campo="valor-indice">
+                <label class="campo__etiqueta" for="indexadas-indice" data-etiqueta-indice>DTF</label>
+                <div class="entrada">
+                  <input id="indexadas-indice" name="valor-indice" type="text" inputmode="decimal" enterkeyhint="next" placeholder="9,25">
+                  <span class="entrada__adorno" aria-hidden="true">%</span>
+                </div>
+                <p class="campo__error" aria-live="polite"></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="plegable" data-para="DTF">
+            <div class="plegable__interior">
+              <div class="campo">
+                <p class="control__etiqueta" id="indexadas-etiqueta-forma">¿En qué forma viene la DTF?</p>
+                <div class="segmentado segmentado--compacto" data-segmentado style="--opciones: 2" role="radiogroup" aria-labelledby="indexadas-etiqueta-forma">
+                  <span class="segmentado__indicador" aria-hidden="true"></span>
+                  <label class="segmentado__opcion"><input type="radio" name="forma-dtf" value="EA" checked>Efectiva anual</label>
+                  <label class="segmentado__opcion"><input type="radio" name="forma-dtf" value="TA">Trimestre anticipado</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="plegable" data-para="IBR">
+            <div class="plegable__interior">
+              <div class="campo">
+                <p class="control__etiqueta" id="indexadas-etiqueta-plazo">Plazo del IBR</p>
+                <div class="segmentado segmentado--compacto" data-segmentado style="--opciones: 2" role="radiogroup" aria-labelledby="indexadas-etiqueta-plazo">
+                  <span class="segmentado__indicador" aria-hidden="true"></span>
+                  <label class="segmentado__opcion"><input type="radio" name="plazo-ibr" value="12" checked>1 mes (mes vencido)</label>
+                  <label class="segmentado__opcion"><input type="radio" name="plazo-ibr" value="4">3 meses (trimestre vencido)</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="plegable" data-para="UVR-pesos">
+            <div class="plegable__interior">
+              <div class="campo">
+                <p class="control__etiqueta" id="indexadas-etiqueta-sentido">Convertir</p>
+                <div class="segmentado segmentado--compacto" data-segmentado style="--opciones: 2" role="radiogroup" aria-labelledby="indexadas-etiqueta-sentido">
+                  <span class="segmentado__indicador" aria-hidden="true"></span>
+                  <label class="segmentado__opcion"><input type="radio" name="sentido" value="a-pesos" checked>UVR a pesos</label>
+                  <label class="segmentado__opcion"><input type="radio" name="sentido" value="a-uvr">Pesos a UVR</label>
+                </div>
+              </div>
+              <div class="plegable" data-para="a-pesos">
+                <div class="plegable__interior">
+                  <div class="campo" data-campo="unidades">
+                    <label class="campo__etiqueta" for="indexadas-unidades">Cantidad de UVR</label>
+                    <div class="entrada">
+                      <input id="indexadas-unidades" name="unidades" type="text" inputmode="decimal" enterkeyhint="next" placeholder="50000">
+                      <span class="entrada__adorno" aria-hidden="true">UVR</span>
+                    </div>
+                    <p class="campo__leido" data-formato="uvr"></p>
+                    <p class="campo__error" aria-live="polite"></p>
+                  </div>
+                </div>
+              </div>
+              <div class="plegable" data-para="a-uvr">
+                <div class="plegable__interior">
+                  <div class="campo" data-campo="pesos">
+                    <label class="campo__etiqueta" for="indexadas-pesos">Valor en pesos</label>
+                    <div class="entrada">
+                      <span class="entrada__adorno" aria-hidden="true">$</span>
+                      <input id="indexadas-pesos" name="pesos" type="text" inputmode="decimal" enterkeyhint="next" placeholder="19000000">
+                    </div>
+                    <p class="campo__leido"></p>
+                    <p class="campo__error" aria-live="polite"></p>
+                  </div>
+                </div>
+              </div>
+              <div class="campo" data-campo="valor-uvr">
+                <label class="campo__etiqueta" for="indexadas-valor-uvr">Valor de la UVR ese día</label>
+                <div class="entrada">
+                  <span class="entrada__adorno" aria-hidden="true">$</span>
+                  <input id="indexadas-valor-uvr" name="valor-uvr" type="text" inputmode="decimal" enterkeyhint="done" placeholder="380">
+                </div>
+                <p class="campo__ayuda">Pesos por cada UVR. Lo publica el Banco de la República a diario.</p>
+                <p class="campo__error" aria-live="polite"></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="plegable" data-para="UVR-variacion">
+            <div class="plegable__interior">
+              <div class="campo" data-campo="uvr-inicial">
+                <label class="campo__etiqueta" for="indexadas-uvr-inicial">UVR al inicio</label>
+                <div class="entrada">
+                  <span class="entrada__adorno" aria-hidden="true">$</span>
+                  <input id="indexadas-uvr-inicial" name="uvr-inicial" type="text" inputmode="decimal" enterkeyhint="next" placeholder="370">
+                </div>
+                <p class="campo__error" aria-live="polite"></p>
+              </div>
+              <div class="campo" data-campo="uvr-final">
+                <label class="campo__etiqueta" for="indexadas-uvr-final">UVR al final</label>
+                <div class="entrada">
+                  <span class="entrada__adorno" aria-hidden="true">$</span>
+                  <input id="indexadas-uvr-final" name="uvr-final" type="text" inputmode="decimal" enterkeyhint="done" placeholder="388,5">
+                </div>
+                <p class="campo__error" aria-live="polite"></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="plegable" data-para="DTF IBR IPC UVR-costo">
+            <div class="plegable__interior">
+              <div class="campo" data-campo="puntos">
+                <label class="campo__etiqueta" for="indexadas-puntos">Puntos (spread)</label>
+                <div class="entrada">
+                  <input id="indexadas-puntos" name="puntos" type="text" inputmode="decimal" enterkeyhint="done" placeholder="3">
+                  <span class="entrada__adorno" aria-hidden="true">%</span>
+                </div>
+                <p class="campo__ayuda" data-ayuda-puntos></p>
+                <p class="campo__error" aria-live="polite"></p>
+              </div>
+              <div class="campo">
+                <label class="campo__etiqueta" for="indexadas-convertir">Convertir también a</label>
+                <div class="selector">
+                  <select id="indexadas-convertir" name="convertir">
+                    <option value="12" selected>Periódica mensual</option>
+                    <option value="6">Periódica bimestral</option>
+                    <option value="4">Periódica trimestral</option>
+                    <option value="3">Periódica cuatrimestral</option>
+                    <option value="2">Periódica semestral</option>
+                    <option value="1">Solo efectiva anual</option>
+                  </select>
+                  <svg class="icono selector__flecha" width="18" height="18" aria-hidden="true"><use href="#i-abajo"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p class="error-general" role="alert" hidden></p>
+          <div class="acciones">
+            <button class="boton boton--secundario" type="button" data-accion="limpiar">Limpiar</button>
+            <button class="boton boton--primario" type="submit">Calcular</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- ===================== Anualidad vencida y anticipada (una pantalla, dos rutas) ===================== -->
+      <section class="pantalla" id="pantalla-anualidad" aria-labelledby="titulo-anualidad" hidden>
+        <div class="encabezado">
+          <span class="encabezado__icono vt" id="icono-anualidad" aria-hidden="true"><svg class="icono" width="26" height="26"><use id="icono-anualidad-uso" href="#i-vencida"/></svg></span>
+          <h1 class="encabezado__titulo vt" id="titulo-anualidad" data-titulo-grande>Anualidad vencida</h1>
+          <p class="encabezado__texto" id="texto-anualidad">Pagos iguales al final de cada periodo.</p>
+        </div>
+
+        <form id="form-anualidad" novalidate autocomplete="off">
+          <fieldset class="bloque">
+            <legend class="bloque__titulo">¿Qué quieres calcular?</legend>
+            <div class="segmentado" data-segmentado style="--opciones: 5">
+              <span class="segmentado__indicador" aria-hidden="true"></span>
+              <label class="segmentado__opcion segmentado__opcion--doble"><input type="radio" name="incognita" value="P" checked><span class="segmentado__simbolo">P</span><span class="segmentado__texto">Presente</span></label>
+              <label class="segmentado__opcion segmentado__opcion--doble"><input type="radio" name="incognita" value="F"><span class="segmentado__simbolo">F</span><span class="segmentado__texto">Futuro</span></label>
+              <label class="segmentado__opcion segmentado__opcion--doble"><input type="radio" name="incognita" value="A"><span class="segmentado__simbolo">A</span><span class="segmentado__texto">Cuota</span></label>
+              <label class="segmentado__opcion segmentado__opcion--doble"><input type="radio" name="incognita" value="n"><span class="segmentado__simbolo">n</span><span class="segmentado__texto">Pagos</span></label>
+              <label class="segmentado__opcion segmentado__opcion--doble"><input type="radio" name="incognita" value="i"><span class="segmentado__simbolo">i</span><span class="segmentado__texto">Tasa</span></label>
+            </div>
+            <button class="enlace" type="button" data-accion="ejemplo">Cargar un ejemplo</button>
+          </fieldset>
+
+          <div class="plegable" data-para="A n i">
+            <div class="plegable__interior">
+              <div class="campo">
+                <p class="control__etiqueta" id="anualidad-etiqueta-desde">¿Qué valor conoces?</p>
+                <div class="segmentado segmentado--compacto" data-segmentado style="--opciones: 2" role="radiogroup" aria-labelledby="anualidad-etiqueta-desde">
+                  <span class="segmentado__indicador" aria-hidden="true"></span>
+                  <label class="segmentado__opcion"><input type="radio" name="desde" value="P" checked>Valor presente (P)</label>
+                  <label class="segmentado__opcion"><input type="radio" name="desde" value="F">Valor futuro (F)</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="plegable" data-para="A-P n-P i-P">
+            <div class="plegable__interior">
+              <div class="campo" data-campo="P">
+                <label class="campo__etiqueta" for="anualidad-P">Valor presente <span class="campo__simbolo">(P)</span></label>
+                <div class="entrada">
+                  <span class="entrada__adorno" aria-hidden="true">$</span>
+                  <input id="anualidad-P" name="P" type="text" inputmode="decimal" enterkeyhint="next" placeholder="20000000">
+                </div>
+                <p class="campo__ayuda">Lo que valen hoy todos los pagos: un préstamo, por ejemplo.</p>
+                <p class="campo__leido"></p>
+                <p class="campo__error" aria-live="polite"></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="plegable" data-para="A-F n-F i-F">
+            <div class="plegable__interior">
+              <div class="campo" data-campo="F">
+                <label class="campo__etiqueta" for="anualidad-F">Valor futuro <span class="campo__simbolo">(F)</span></label>
+                <div class="entrada">
+                  <span class="entrada__adorno" aria-hidden="true">$</span>
+                  <input id="anualidad-F" name="F" type="text" inputmode="decimal" enterkeyhint="next" placeholder="13171577,56">
+                </div>
+                <p class="campo__ayuda">Lo que se reúne al final con todos los pagos: un ahorro, por ejemplo.</p>
+                <p class="campo__leido"></p>
+                <p class="campo__error" aria-live="polite"></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="plegable" data-para="P F n i">
+            <div class="plegable__interior">
+              <div class="campo" data-campo="A">
+                <label class="campo__etiqueta" for="anualidad-A">Cuota de cada periodo <span class="campo__simbolo">(A)</span></label>
+                <div class="entrada">
+                  <span class="entrada__adorno" aria-hidden="true">$</span>
+                  <input id="anualidad-A" name="A" type="text" inputmode="decimal" enterkeyhint="next" placeholder="687444,55">
+                </div>
+                <p class="campo__leido"></p>
+                <p class="campo__error" aria-live="polite"></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="plegable" data-para="P F A n">
+            <div class="plegable__interior">
+              <div class="campo" data-campo="tasa">
+                <label class="campo__etiqueta" for="anualidad-tasa">Tasa de interés <span class="campo__simbolo">(i)</span></label>
+                <div class="entrada">
+                  <input id="anualidad-tasa" name="tasa" type="text" inputmode="decimal" enterkeyhint="next" placeholder="1,2">
+                  <span class="entrada__adorno" aria-hidden="true">%</span>
+                </div>
+                <div data-tasa="tasa"></div>
+                <p class="campo__traduccion" data-traduccion="tasa"><svg class="icono" width="18" height="18" aria-hidden="true"><use href="#i-flecha"/></svg><span></span></p>
+                <p class="campo__error" aria-live="polite"></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="plegable" data-para="P F A i">
+            <div class="plegable__interior">
+              <div class="campo" data-campo="n">
+                <label class="campo__etiqueta" for="anualidad-n">Número de pagos <span class="campo__simbolo">(n)</span></label>
+                <div class="entrada">
+                  <input id="anualidad-n" name="n" type="text" inputmode="decimal" enterkeyhint="done" placeholder="36">
+                </div>
+                <p class="campo__error" aria-live="polite"></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="campo">
+            <label class="campo__etiqueta" for="anualidad-periodo">¿Cada cuánto es un pago?</label>
+            <div class="selector">
+              <select id="anualidad-periodo" name="periodo-pagos">
+                <option value="12" selected>Cada mes</option>
+                <option value="6">Cada bimestre</option>
+                <option value="4">Cada trimestre</option>
+                <option value="3">Cada cuatrimestre</option>
+                <option value="2">Cada semestre</option>
+                <option value="1">Cada año</option>
+              </select>
+              <svg class="icono selector__flecha" width="18" height="18" aria-hidden="true"><use href="#i-abajo"/></svg>
+            </div>
+            <p class="campo__ayuda">La tasa se convierte a este periodo antes de calcular.</p>
+          </div>
+
+          <p class="error-general" role="alert" hidden></p>
+          <div class="acciones">
+            <button class="boton boton--secundario" type="button" data-accion="limpiar">Limpiar</button>
+            <button class="boton boton--primario" type="submit">Calcular</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- ===================== Anualidad perpetua ===================== -->
+      <section class="pantalla" id="pantalla-anualidad-perpetua" aria-labelledby="titulo-perpetua" hidden>
+        <div class="encabezado">
+          <span class="encabezado__icono vt" style="view-transition-name: icono-perpetua" aria-hidden="true"><svg class="icono" width="26" height="26"><use href="#i-perpetua"/></svg></span>
+          <h1 class="encabezado__titulo vt" style="view-transition-name: titulo-perpetua" id="titulo-perpetua" data-titulo-grande>Anualidad perpetua</h1>
+          <p class="encabezado__texto">Pagos iguales que no terminan, el primero al final del periodo 1. Solo tiene valor presente.</p>
+        </div>
+
+        <form id="form-perpetua" novalidate autocomplete="off">
+          <fieldset class="bloque">
+            <legend class="bloque__titulo">¿Qué quieres calcular?</legend>
+            <div class="segmentado" data-segmentado style="--opciones: 2">
+              <span class="segmentado__indicador" aria-hidden="true"></span>
+              <label class="segmentado__opcion segmentado__opcion--doble"><input type="radio" name="incognita" value="P" checked><span class="segmentado__simbolo">P</span><span class="segmentado__texto">Capital requerido</span></label>
+              <label class="segmentado__opcion segmentado__opcion--doble"><input type="radio" name="incognita" value="A"><span class="segmentado__simbolo">A</span><span class="segmentado__texto">Pago sostenible</span></label>
+            </div>
+            <button class="enlace" type="button" data-accion="ejemplo">Cargar un ejemplo</button>
+          </fieldset>
+
+          <div class="plegable" data-para="P">
+            <div class="plegable__interior">
+              <div class="campo" data-campo="A">
+                <label class="campo__etiqueta" for="perpetua-A">Pago de cada periodo <span class="campo__simbolo">(A)</span></label>
+                <div class="entrada">
+                  <span class="entrada__adorno" aria-hidden="true">$</span>
+                  <input id="perpetua-A" name="A" type="text" inputmode="decimal" enterkeyhint="next" placeholder="5000000">
+                </div>
+                <p class="campo__leido"></p>
+                <p class="campo__error" aria-live="polite"></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="plegable" data-para="A">
+            <div class="plegable__interior">
+              <div class="campo" data-campo="P">
+                <label class="campo__etiqueta" for="perpetua-P">Capital disponible <span class="campo__simbolo">(P)</span></label>
+                <div class="entrada">
+                  <span class="entrada__adorno" aria-hidden="true">$</span>
+                  <input id="perpetua-P" name="P" type="text" inputmode="decimal" enterkeyhint="next" placeholder="300000000">
+                </div>
+                <p class="campo__leido"></p>
+                <p class="campo__error" aria-live="polite"></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="campo" data-campo="tasa">
+            <label class="campo__etiqueta" for="perpetua-tasa">Tasa de interés <span class="campo__simbolo">(i)</span></label>
+            <div class="entrada">
+              <input id="perpetua-tasa" name="tasa" type="text" inputmode="decimal" enterkeyhint="next" placeholder="10">
+              <span class="entrada__adorno" aria-hidden="true">%</span>
+            </div>
+            <div data-tasa="tasa"></div>
+            <p class="campo__traduccion" data-traduccion="tasa"><svg class="icono" width="18" height="18" aria-hidden="true"><use href="#i-flecha"/></svg><span></span></p>
+            <p class="campo__error" aria-live="polite"></p>
+          </div>
+
+          <div class="campo">
+            <label class="campo__etiqueta" for="perpetua-periodo">¿Cada cuánto es un pago?</label>
+            <div class="selector">
+              <select id="perpetua-periodo" name="periodo-pagos">
+                <option value="12" selected>Cada mes</option>
+                <option value="6">Cada bimestre</option>
+                <option value="4">Cada trimestre</option>
+                <option value="3">Cada cuatrimestre</option>
+                <option value="2">Cada semestre</option>
+                <option value="1">Cada año</option>
+              </select>
+              <svg class="icono selector__flecha" width="18" height="18" aria-hidden="true"><use href="#i-abajo"/></svg>
+            </div>
+            <p class="campo__ayuda">La fórmula usa la tasa del periodo de pago (la periódica, o la efectiva anual si los pagos son anuales): se convierte antes de calcular.</p>
+          </div>
+
+          <p class="error-general" role="alert" hidden></p>
+          <div class="acciones">
+            <button class="boton boton--secundario" type="button" data-accion="limpiar">Limpiar</button>
+            <button class="boton boton--primario" type="submit">Calcular</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Controles de una tasa (tipo, periodo y modalidad): formularios.js los copia donde haya data-tasa -->
+      <template id="plantilla-tasa">
+        <div class="opciones-tasa">
+          <div class="opciones-tasa__tipo">
+            <p class="control__etiqueta" data-id="etiqueta-tipo">Tipo</p>
+            <div class="segmentado segmentado--compacto" data-segmentado style="--opciones: 3" role="radiogroup" data-etiquetado="etiqueta-tipo">
+              <span class="segmentado__indicador" aria-hidden="true"></span>
+              <label class="segmentado__opcion"><input type="radio" data-nombre="tipo" value="periodica" checked>Periódica</label>
+              <label class="segmentado__opcion"><input type="radio" data-nombre="tipo" value="nominal">Nominal</label>
+              <label class="segmentado__opcion"><input type="radio" data-nombre="tipo" value="anual">Efectiva anual</label>
+            </div>
+          </div>
+          <div>
+            <label class="control__etiqueta" data-para-selector>Periodo de la tasa</label>
+            <div class="selector">
+              <select data-nombre="periodo">
+                <option value="12" selected>Mensual</option>
+                <option value="6">Bimestral</option>
+                <option value="4">Trimestral</option>
+                <option value="3">Cuatrimestral</option>
+                <option value="2">Semestral</option>
+                <option value="1">Anual</option>
+              </select>
+              <svg class="icono selector__flecha" width="18" height="18" aria-hidden="true"><use href="#i-abajo"/></svg>
+            </div>
+          </div>
+          <div>
+            <p class="control__etiqueta" data-id="etiqueta-modalidad">Modalidad</p>
+            <div class="segmentado segmentado--compacto" data-segmentado style="--opciones: 2" role="radiogroup" data-etiquetado="etiqueta-modalidad">
+              <span class="segmentado__indicador" aria-hidden="true"></span>
+              <label class="segmentado__opcion"><input type="radio" data-nombre="modalidad" value="vencida" checked>Vencida</label>
+              <label class="segmentado__opcion"><input type="radio" data-nombre="modalidad" value="anticipada">Anticipada</label>
+            </div>
+          </div>
+        </div>
+      </template>
 
       <!-- ===================== Historial ===================== -->
       <section class="pantalla" id="pantalla-historial" aria-labelledby="titulo-historial" hidden>
@@ -486,9 +949,49 @@
         </div>
 
         <article class="tarjeta texto">
+          <h2>Cómo usar la calculadora</h2>
+          <ol class="manual">
+            <li><strong>Elige el módulo</strong> en Inicio: interés compuesto, conversión de tasas, tasas indexadas o una anualidad (vencida, anticipada o perpetua).</li>
+            <li><strong>Elige qué calcular</strong> arriba del formulario. Solo aparecen los datos que hacen falta para esa incógnita.</li>
+            <li><strong>Escribe los datos</strong> con su unidad: la tasa con su tipo (periódica, nominal o efectiva anual), su periodo y si es vencida o anticipada; el tiempo o los pagos con su periodicidad. La app convierte la tasa al periodo que toca y te muestra la conversión.</li>
+            <li><strong>Toca Calcular.</strong> Verás el resultado con su unidad y su momento en el tiempo, el gráfico y los datos extra con su interpretación.</li>
+            <li><strong>Revisa cómo se calculó:</strong> en "¿Cómo se calculó?" están los datos, las conversiones y la fórmula de la hoja con su número y con los números reemplazados. "Explícame" lo recorre paso a paso.</li>
+            <li><strong>Sigue trabajando:</strong> "¿Y si…?" mueve un dato y muestra el efecto; "Usar esta tasa" lleva una tasa calculada a otro módulo; "Copiar resultado" la copia con su fórmula; el historial guarda tus cálculos.</li>
+          </ol>
+          <p>Si un dato no tiene sentido financiero (una tasa anticipada de 100 % o más, una cuota que no alcanza a cubrir los intereses, un número de pagos que no es entero…), la app no calcula y te dice por qué.</p>
+          <a class="boton boton--chico" href="#validacion">Ver los ejercicios de validación</a>
+        </article>
+
+        <article class="tarjeta texto">
           <h2>Interés compuesto</h2>
           <p><strong>Cuándo usarlo:</strong> cuando un valor de hoy y uno futuro se relacionan con una tasa que capitaliza, como una inversión, un CDT o una deuda sin cuotas.</p>
           <p><strong>Qué datos necesitas:</strong> tres de estos cuatro: valor presente (P), valor futuro (F), tasa (i) y tiempo (n). La app calcula el que falta.</p>
+        </article>
+
+        <article class="tarjeta texto">
+          <h2>Conversión de tasas</h2>
+          <p><strong>Cuándo usarla:</strong> para comparar tasas que vienen en formas distintas, o para tener la tasa en la forma que pide un ejercicio.</p>
+          <p><strong>Qué datos necesitas:</strong> la tasa que tienes (valor, tipo, periodo y modalidad) y la forma a la que quieres llevarla. La app pasa por la efectiva anual y muestra cada paso con su fórmula (1.1 a 1.6, 3.1 y 3.2).</p>
+          <p><strong>Los tres tipos de la hoja:</strong> periódica (<var>i</var><sub>p</sub>, la de cada periodo: 1,50 % mensual), nominal (<var>i</var><sub>n</sub>, anual y repartida entre los <var>m</var> periodos: 18,00 % nominal mes vencido) y efectiva anual (<var>i</var><sub>ea</sub>). Por ejemplo, para pasar una nominal a periódica o a efectiva anual, elige "Nominal" en la tasa que tienes y "Periódica" o "Efectiva anual" en "Convertir a".</p>
+        </article>
+
+        <article class="tarjeta texto">
+          <h2>Tasas indexadas</h2>
+          <p><strong>DTF e IBR:</strong> el índice y los puntos se suman (4.2), pero solo si están en la misma forma; la app convierte antes si hace falta.</p>
+          <p><strong>IPC y UVR:</strong> el índice y los puntos se combinan (4.1): (1 + índice) · (1 + puntos) − 1. Con la UVR también puedes pasar de UVR a pesos y calcular su variación.</p>
+          <p>Los valores de los índices los escribes tú: la app no los consulta en internet.</p>
+        </article>
+
+        <article class="tarjeta texto">
+          <h2>Anualidades</h2>
+          <p><strong>Vencida:</strong> pagos iguales al final de cada periodo (fórmulas 5.1 a 5.3). <strong>Anticipada:</strong> al inicio, el primero hoy (6.1 a 6.3).</p>
+          <p><strong>Qué datos necesitas:</strong> elige qué calcular (P, F, A, n o i) y, para A, n e i, si conoces el valor presente o el futuro. La tasa se convierte al periodo de los pagos.</p>
+          <p>La tasa de una anualidad no tiene despeje en la hoja: la app la busca con un método numérico (bisección) y lo indica.</p>
+        </article>
+
+        <article class="tarjeta texto">
+          <h2>Anualidad perpetua</h2>
+          <p>Pagos iguales que no terminan, el primero al final del periodo 1. <strong>Capital requerido:</strong> P = A / i. <strong>Pago sostenible:</strong> A = P · i. La tasa debe ser la del periodo de pago.</p>
         </article>
 
         <article class="tarjeta texto">
@@ -502,7 +1005,7 @@
 
         <article class="tarjeta texto">
           <h2>La tasa y el tiempo</h2>
-          <p>Indica cómo está expresada la tasa: efectiva o nominal anual, su periodo y si es vencida o anticipada. Antes de calcular, la app la convierte a la unidad del tiempo y te muestra la conversión con su número de fórmula.</p>
+          <p>Indica cómo está expresada la tasa: periódica, nominal o efectiva anual, su periodo (en la nominal, la capitalización) y si es vencida o anticipada. Antes de calcular, la app la convierte a la unidad del tiempo y te muestra la conversión con su número de fórmula.</p>
         </article>
 
         <article class="tarjeta texto">
@@ -516,15 +1019,13 @@
 
         <h2 class="titulo-seccion">Glosario</h2>
         <dl class="glosario">
-          <div class="glosario__item"><dt>Tasa efectiva</dt><dd>Interés que realmente se gana en un periodo. Ej.: 1,5 % efectiva mensual.</dd></div>
-          <div class="glosario__item"><dt>Efectiva anual (EA)</dt><dd>Rendimiento total de un año, con los intereses ya capitalizados.</dd></div>
-          <div class="glosario__item"><dt>Tasa nominal anual</dt><dd>Tasa anual que se reparte entre los periodos de capitalización. Ej.: 18 % nominal anual mes vencido = 1,5 % mensual.</dd></div>
-          <div class="glosario__item"><dt>Tasa periódica</dt><dd>Tasa de un solo periodo: mensual, trimestral, semestral…</dd></div>
+          <div class="glosario__item"><dt>Tasa periódica (<var>i</var><sub>p</sub>)</dt><dd>Interés que realmente se gana en un periodo: mensual, trimestral, semestral… Ej.: 1,50 % periódica mensual (también se dice efectiva mensual).</dd></div>
+          <div class="glosario__item"><dt>Tasa nominal anual (<var>i</var><sub>n</sub>)</dt><dd>Tasa anual que se reparte entre los periodos de capitalización. Ej.: 18,00 % nominal anual mes vencido = 1,50 % periódica mensual (fórmula 1.1).</dd></div>
+          <div class="glosario__item"><dt>Efectiva anual (EA, <var>i</var><sub>ea</sub>)</dt><dd>Rendimiento total de un año, con los intereses ya capitalizados. Sirve para comparar tasas.</dd></div>
           <div class="glosario__item"><dt>Vencida</dt><dd>El interés se liquida al final del periodo.</dd></div>
           <div class="glosario__item"><dt>Anticipada</dt><dd>El interés se cobra al inicio del periodo.</dd></div>
           <div class="glosario__item"><dt>Capitalización</dt><dd>Sumar los intereses al capital para que también ganen interés.</dd></div>
         </dl>
-        <p class="nota">La ayuda de los demás módulos se agregará cuando estén listos.</p>
       </section>
 
       <!-- ===================== Acerca de ===================== -->
@@ -537,6 +1038,15 @@
           <p class="antetitulo">Proyecto de aula</p>
           <h2>Ingeniería Económica</h2>
           <p>Calculadora financiera para resolver y validar las operaciones del curso. Las fórmulas siguen la hoja de fórmulas de clase y cada resultado indica el número de la fórmula usada.</p>
+        </article>
+
+        <article class="tarjeta texto">
+          <h2>Validación</h2>
+          <p>Los cinco ejercicios de validación, resueltos a mano y con la calculadora, con su matriz de comprobación. Cada uno se puede abrir en la calculadora con sus datos.</p>
+          <a class="boton boton--chico boton--primario" href="#validacion">
+            <svg class="icono" width="18" height="18" aria-hidden="true"><use href="#i-listo"/></svg>
+            Ver la validación
+          </a>
         </article>
 
         <article class="tarjeta texto">
@@ -570,7 +1080,32 @@
 
         <article class="tarjeta texto">
           <h2>Estado</h2>
-          <p>Versión 0.3: módulo de interés compuesto, con explicación en voz alta, "¿Y si…?", historial y app instalable que funciona sin internet. Los demás módulos están en construcción.</p>
+          <p>Versión 1.0: los seis módulos de la hoja de clase (interés compuesto, conversión de tasas, tasas indexadas y anualidades vencida, anticipada y perpetua), cada uno con su gráfico, explicación en voz alta, "¿Y si…?" e historial, y los cinco ejercicios de validación. Se instala en el celular y funciona sin internet.</p>
+          <a class="boton boton--chico" href="pruebas.html">Ver las pruebas de cálculo</a>
+        </article>
+      </section>
+
+      <!-- ===================== Validación (validacion.js) ===================== -->
+      <section class="pantalla" id="pantalla-validacion" aria-labelledby="titulo-validacion" hidden>
+        <div class="encabezado">
+          <h1 class="encabezado__titulo" id="titulo-validacion" data-titulo-grande>Validación</h1>
+          <p class="encabezado__texto">Los cinco ejercicios del proyecto, resueltos a mano y con la calculadora. Toca un número para ir a su ejercicio.</p>
+        </div>
+
+        <article class="tarjeta texto">
+          <h2>Matriz de comprobación</h2>
+          <p class="validacion__resumen" id="validacion-resumen"></p>
+          <ol class="matriz" id="validacion-matriz"></ol>
+        </article>
+
+        <div id="validacion-ejercicios"></div>
+
+        <article class="tarjeta texto">
+          <h2>Cómo se validó</h2>
+          <p><strong>A mano:</strong> sin la calculadora, con las fórmulas de la hoja de clase, la tasa en decimal con 8 decimales y los factores con 8.</p>
+          <p><strong>Con la calculadora:</strong> la columna "Calculadora" se calcula al abrir esta pantalla con las mismas funciones de la app (finanzas.js), sin redondear pasos intermedios. "Abrir en la calculadora" hace el mismo cálculo en el módulo.</p>
+          <p><strong>Redondeo:</strong> la app muestra el dinero al peso y los porcentajes con 2 decimales. Se acepta como redondeo una diferencia de hasta $ 1 por cada $ 100.000 del resultado, o de una diezmilésima de punto en las tasas; cada diferencia se explica en su ejercicio.</p>
+          <p>Además, las pruebas de cálculo comparan cada fórmula con ejemplos resueltos.</p>
           <a class="boton boton--chico" href="pruebas.html">Ver las pruebas de cálculo</a>
         </article>
       </section>
@@ -607,7 +1142,15 @@
 
   <script src="finanzas.js"></script>
   <script src="animaciones.js"></script>
+  <script src="diagramas.js"></script>
+  <script src="visuales.js"></script>
   <script src="voz.js"></script>
   <script src="app.js"></script>
+  <script src="formularios.js"></script>
+  <script src="conversion.js"></script>
+  <script src="indexadas.js"></script>
+  <script src="anualidades.js"></script>
+  <script src="validacion.js"></script>
+  <script>iniciar();</script>
 </body>
 </html>

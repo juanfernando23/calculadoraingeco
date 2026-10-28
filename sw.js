@@ -9,15 +9,22 @@
  * Solo si se agregan o se quitan archivos: actualizar ARCHIVOS y subir VERSION.
  */
 
-const VERSION = "calculadora-v1";
+const VERSION = "calculadora-v3";
 const ARCHIVOS = [
   "./",
   "index.html",
   "estilos.css",
   "finanzas.js",
   "animaciones.js",
+  "diagramas.js",
+  "visuales.js",
   "voz.js",
   "app.js",
+  "formularios.js",
+  "conversion.js",
+  "indexadas.js",
+  "anualidades.js",
+  "validacion.js",
   "pruebas.html",
   "pruebas.js",
   "manifest.webmanifest",

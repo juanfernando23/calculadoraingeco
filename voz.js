@@ -52,7 +52,7 @@ function enteroEnPalabras(n) {
 function numeroEnPalabras(texto) {
   const [entero, decimales] = texto.replace(/\./g, "").split(",");
   const palabras = enteroEnPalabras(Number(entero));
-  if (!decimales) return palabras;
+  if (!decimales || /^0+$/.test(decimales)) return palabras; // "18,00": dieciocho
   const parte = decimales.length <= 2 && decimales[0] !== "0" ? enteroEnPalabras(Number(decimales)) : [...decimales].map((d) => UNIDADES[d]).join(" ");
   return `${palabras} coma ${parte}`;
 }
@@ -80,6 +80,9 @@ function textoParaVoz(texto) {
     .replace(/\s*=\s*/g, " igual a ")
     .replace(/\s*·\s*/g, ", ")
     .replace(/\s*→\s*/g, " a ")
+    .replace(/\s*×\s*/g, " por ")
+    .replace(/\s*÷\s*/g, " entre ")
+    .replace(/\s*[−]\s*/g, " menos ")
     .replace(/\s+/g, " ")
     .trim();
 }

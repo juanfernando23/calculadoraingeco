@@ -75,6 +75,139 @@ function anticipadaAVencida(i_a) {
   return i_a < 1 ? i_a / (1 - i_a) : NaN;
 }
 
+// ---------- Sección 4 · Interés indexado ----------
+
+// Hoja 4.1 · Fórmula combinada (IPC + puntos): i = (1 + i_1)(1 + i_2) - 1
+function indexacionCombinada(i1, i2) {
+  return (1 + i1) * (1 + i2) - 1;
+}
+
+// Hoja 4.2 · Indexación lineal (DTF o IBR + puntos): i = I_1 + I_2.
+// Solo vale si las dos tasas están en la misma forma (periodicidad y modalidad).
+function indexacionLineal(I1, I2) {
+  return I1 + I2;
+}
+
+// UVR (no está en la hoja). Es una unidad, no una tasa: un valor en pesos por cada UVR.
+function uvrAPesos(unidades, valorUVR) {
+  return unidades * valorUVR;
+}
+
+function pesosAUvr(pesos, valorUVR) {
+  return pesos / valorUVR;
+}
+
+// Variación de la UVR entre dos fechas: UVR final / UVR inicial - 1
+function variacionUvr(inicial, final) {
+  return final / inicial - 1;
+}
+
+// ---------- Sección 5 · Anualidades vencidas (pagos al final de cada periodo) ----------
+
+// Hoja 5.1 · Valor presente: P = A · [((1 + i)^n - 1) / (i · (1 + i)^n)]
+function vpAnualidadVencida(A, i, n) {
+  const f = Math.pow(1 + i, n);
+  return A * ((f - 1) / (i * f));
+}
+
+// Hoja 5.1 · Cuota desde P: A = P · [(i · (1 + i)^n) / ((1 + i)^n - 1)]
+function cuotaDesdeVPVencida(P, i, n) {
+  const f = Math.pow(1 + i, n);
+  return P * ((i * f) / (f - 1));
+}
+
+// Hoja 5.2 · Valor futuro: F = A · [((1 + i)^n - 1) / i]
+function vfAnualidadVencida(A, i, n) {
+  return A * ((Math.pow(1 + i, n) - 1) / i);
+}
+
+// Hoja 5.2 · Cuota desde F: A = F · [i / ((1 + i)^n - 1)]
+function cuotaDesdeVFVencida(F, i, n) {
+  return F * (i / (Math.pow(1 + i, n) - 1));
+}
+
+// Hoja 5.3 · n con VP: n = -ln(1 - VP · i / A) / ln(1 + i)
+// Solo existe si A > VP · i (la cuota cubre el interés de cada periodo).
+function nDesdeVPVencida(P, A, i) {
+  const x = 1 - (P * i) / A;
+  return x > 0 ? -Math.log(x) / Math.log(1 + i) : NaN;
+}
+
+// Hoja 5.3 · n con VF: n = ln(VF · i / A + 1) / ln(1 + i)
+function nDesdeVFVencida(F, A, i) {
+  return Math.log((F * i) / A + 1) / Math.log(1 + i);
+}
+
+// ---------- Sección 6 · Anualidades anticipadas (pagos al inicio de cada periodo) ----------
+
+// Hoja 6.1 · Valor presente: P = A + A · [((1 + i)^(n-1) - 1) / (i · (1 + i)^(n-1))]
+function vpAnualidadAnticipada(A, i, n) {
+  const f = Math.pow(1 + i, n - 1);
+  return A + A * ((f - 1) / (i * f));
+}
+
+// Hoja 6.1 · Cuota desde P: A = P / {1 + [((1 + i)^(n-1) - 1) / (i · (1 + i)^(n-1))]}
+function cuotaDesdeVPAnticipada(P, i, n) {
+  const f = Math.pow(1 + i, n - 1);
+  return P / (1 + (f - 1) / (i * f));
+}
+
+// Hoja 6.2 · Valor futuro: F = A · [((1 + i)^(n+1) - (1 + i)) / i]
+function vfAnualidadAnticipada(A, i, n) {
+  return A * ((Math.pow(1 + i, n + 1) - (1 + i)) / i);
+}
+
+// Despeje de la 6.2 · Cuota desde F: A = F · i / [(1 + i)^(n+1) - (1 + i)]
+function cuotaDesdeVFAnticipada(F, i, n) {
+  return (F * i) / (Math.pow(1 + i, n + 1) - (1 + i));
+}
+
+// Hoja 6.3 · n con VP: n = -ln(1 - VP · i / (A · (1 + i))) / ln(1 + i)
+// Solo existe si A · (1 + i) > VP · i.
+function nDesdeVPAnticipada(P, A, i) {
+  const x = 1 - (P * i) / (A * (1 + i));
+  return x > 0 ? -Math.log(x) / Math.log(1 + i) : NaN;
+}
+
+// Hoja 6.3 · n con VF: n = ln(VF · i / (A · (1 + i)) + 1) / ln(1 + i)
+function nDesdeVFAnticipada(F, A, i) {
+  return Math.log((F * i) / (A * (1 + i)) + 1) / Math.log(1 + i);
+}
+
+// Extra (no está en la hoja) · Tasa de una anualidad, por bisección: no hay despeje.
+// El valor presente baja cuando la tasa sube y el futuro sube, así que se parte el intervalo
+// a la mitad hasta encerrar la tasa. desde: "P" o "F". Devuelve NaN si la tasa sería cero o
+// negativa: la suma de las cuotas (A · n) debe superar a P, o ser menor que F.
+function tasaAnualidad(valor, A, n, desde, anticipada) {
+  const conTasa = (i) => {
+    if (desde === "P") return anticipada ? vpAnualidadAnticipada(A, i, n) : vpAnualidadVencida(A, i, n);
+    return anticipada ? vfAnualidadAnticipada(A, i, n) : vfAnualidadVencida(A, i, n);
+  };
+  const sube = desde === "F";
+  if (sube ? !(valor > A * n) : !(valor < A * n)) return NaN;
+  let bajo = 1e-12;
+  let alto = 1;
+  for (let k = 0; k < 60 && (sube ? conTasa(alto) < valor : conTasa(alto) > valor); k++) alto *= 2;
+  for (let k = 0; k < 200; k++) {
+    const medio = (bajo + alto) / 2;
+    if (sube ? conTasa(medio) < valor : conTasa(medio) > valor) bajo = medio;
+    else alto = medio;
+  }
+  return (bajo + alto) / 2;
+}
+
+// ---------- Sección 7 · Anualidades perpetuas (pagos que no terminan) ----------
+
+// Valor presente (capital requerido): P = A / i
+function vpPerpetuidad(A, i) {
+  return A / i;
+}
+
+// Cuota perpetua (pago sostenible): A = P · i
+function pagoPerpetuidad(P, i) {
+  return P * i;
+}
+
 // ---------- Procedimiento general de conversión ----------
 //
 // Lleva una tasa de cualquier forma a cualquier otra pasando por la efectiva anual,
@@ -131,6 +264,26 @@ if (typeof module !== "undefined") {
     nCompuesto,
     vencidaAAnticipada,
     anticipadaAVencida,
+    indexacionCombinada,
+    indexacionLineal,
+    uvrAPesos,
+    pesosAUvr,
+    variacionUvr,
+    vpAnualidadVencida,
+    cuotaDesdeVPVencida,
+    vfAnualidadVencida,
+    cuotaDesdeVFVencida,
+    nDesdeVPVencida,
+    nDesdeVFVencida,
+    vpAnualidadAnticipada,
+    cuotaDesdeVPAnticipada,
+    vfAnualidadAnticipada,
+    cuotaDesdeVFAnticipada,
+    nDesdeVPAnticipada,
+    nDesdeVFAnticipada,
+    tasaAnualidad,
+    vpPerpetuidad,
+    pagoPerpetuidad,
     convertirTasa,
   };
 }

@@ -283,6 +283,7 @@ const MAX_BARRAS = 40;
 const DURACION_CONSTRUIR = 3600;
 const DURACION_ACTUALIZAR = 900;
 const DURACION_EN_VIVO = 260; // cada paso del deslizador de "¿Y si…?"
+const DURACION_ESTRENO = 400; // al estrenar una vista, lo que tarda en irse la anterior
 
 // Qué tan visible queda cada parte del gráfico en cada enfoque (0 a 1).
 // "resto" son todas las barras menos la última; "cruce" es la marca donde se alcanza la meta.
@@ -426,14 +427,13 @@ function emparejarBarras(antes, despues) {
 // datos: {
 //   tipo                    "flujo" (por defecto: diagrama de flujo de caja), "barras" o "area"
 //   flujo                   textos del diagrama: { incognita: "F" | "P" | "i" | "n",
-//                           base: "1,015", exponente: "24" o "n", tasa: "1,5 % mensual" }
+//                           base: "1,015", exponente: "24" o "n", tasa: "1,50 % mensual" }
 //   P, i, n                 valores ya calculados (i en decimal, n en periodos)
 //   meta                    opcional: valor futuro buscado, cuando la incógnita es el tiempo
 //   singular, plural        nombre del periodo ("mes", "meses")
-//   dinero(valor)           pesos con centavos: $ 14.295.028,12
-//   dineroCorto(valor)      pesos sin centavos de sobra: $ 150.000
+//   dinero(valor)           pesos sin decimales: $ 14.295.028
 //   dineroCompacto(valor)   pesos abreviados para la escala: $ 5 M
-//   numero(valor)           número de periodos: 24 · 2,5
+//   numero(valor)           número de periodos: 24 · 27,23
 //   descripcion             texto para lectores de pantalla
 //   alLeer(texto)           recibe la lectura del periodo seleccionado
 // }
@@ -446,6 +446,11 @@ function crearGraficoCrecimiento(canvas, datosIniciales) {
   let mezclaArea = datos.tipo === "area" ? 1 : 0; // 0 = barras, 1 = área; en medio, pasando de uno a otro
   let saltarCambioTipo = null;
   let capa = null; // lienzo aparte para fundir el diagrama con el gráfico al cambiar de vista
+  // Vistas que ya se dibujaron con este cálculo. Las demás se estrenan: se dibujan desde cero,
+  // como al calcular, mientras se desvanece una foto de la anterior (salida).
+  let tipoActual = pesoFlujo === 1 ? "flujo" : mezclaArea === 1 ? "area" : "barras";
+  const vistas = new Set();
+  let salida = null;
   // Mientras se pasa de un cálculo al siguiente: { anterior, datosAnteriores, barras, mezcla,
   // textoBurbuja, alfaBurbuja }. "mezcla" va de 0 (cálculo anterior) a 1 (cálculo nuevo).
   let transicion = null;
@@ -494,7 +499,7 @@ function crearGraficoCrecimiento(canvas, datosIniciales) {
     const nota = (j) => {
       const k = Math.floor(periodos[j]);
       const interes = vfCompuesto(modelo.P, modelo.i, k) - vfCompuesto(modelo.P, modelo.i, k - 1);
-      return { indice: j, texto: `+${datos.dineroCorto(interes)}` };
+      return { indice: j, texto: `+${datos.dinero(interes)}` };
     };
     let ultimaEntera = total - 1;
     while (ultimaEntera > 1 && !Number.isInteger(periodos[ultimaEntera])) ultimaEntera--;
@@ -1101,6 +1106,7 @@ function crearGraficoCrecimiento(canvas, datosIniciales) {
     if (transicion) actualizarMedidas();
     const { ctx, width, height } = lienzo;
     ctx.clearRect(0, 0, width, height);
+    if (salida) dibujarSalida(ctx);
     if (pesoFlujo < 1) {
       if (pesoFlujo <= 0) pintarGrafico(ctx);
       else {
@@ -1115,6 +1121,25 @@ function crearGraficoCrecimiento(canvas, datosIniciales) {
     }
     if (pesoFlujo > 0) dibujarFlujo(ctx, pesoFlujo);
     ctx.globalAlpha = 1;
+  }
+
+  // Al estrenar una vista, la anterior se desvanece al comenzar la construcción.
+  function dibujarSalida(ctx) {
+    const avance = vista.construyendo ? (vista.progreso * DURACION_CONSTRUIR) / DURACION_ESTRENO : 1;
+    if (avance >= 1) return;
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalAlpha = 1 - suavizar(avance);
+    ctx.drawImage(salida, 0, 0);
+    ctx.restore();
+  }
+
+  function fotografiar() {
+    const copia = document.createElement("canvas");
+    copia.width = canvas.width;
+    copia.height = canvas.height;
+    copia.getContext("2d").drawImage(canvas, 0, 0);
+    return copia;
   }
 
   // ----- Diagrama de flujo de caja -----
@@ -1530,7 +1555,7 @@ function crearGraficoCrecimiento(canvas, datosIniciales) {
   // En el diagrama, la lectura habla de equivalencia: lo que vale ese dinero en ese periodo.
   function lecturaDe(k) {
     if (k === 0) return textoDe(0);
-    if (enDiagrama()) return `${nombrePeriodo()} ${datos.numero(k)} · los ${datos.dineroCorto(modelo.P)} de hoy equivalen a ${datos.dinero(saldoEn(k))}`;
+    if (enDiagrama()) return `${nombrePeriodo()} ${datos.numero(k)} · los ${datos.dinero(modelo.P)} de hoy equivalen a ${datos.dinero(saldoEn(k))}`;
     return `${textoDe(k)} · intereses ${datos.dinero(saldoEn(k) - modelo.P)}`;
   }
 
@@ -1688,10 +1713,13 @@ function crearGraficoCrecimiento(canvas, datosIniciales) {
     detenerPulso();
     quitarGuia();
     transicion = null;
+    salida = null;
     construido = false;
     alfaBurbuja = 0;
     estado = { visibles: 0, enfoque: "todo", notas: null };
     vista = calcularVista(estado, estado, 1);
+    vistas.clear();
+    vistas.add(tipoActual);
     if (lienzo && lienzo.width) medir();
     pintar();
     leerPorDefecto();
@@ -1703,6 +1731,7 @@ function crearGraficoCrecimiento(canvas, datosIniciales) {
     pendiente = false;
     const terminar = () => {
       construido = true;
+      salida = null;
       pulsoFinal();
     };
     if (movimientoReducido()) {
@@ -1768,6 +1797,9 @@ function crearGraficoCrecimiento(canvas, datosIniciales) {
     estado = { visibles: modelo.total, enfoque: "todo", notas: null };
     vista = calcularVista(estado, estado, 1);
     alfaBurbuja = 0;
+    // Un cálculo nuevo se estrena en las otras vistas; "¿Y si…?" (forzar) no cuenta como nuevo.
+    if (!forzar) vistas.clear();
+    vistas.add(tipoActual);
     canvas.setAttribute("aria-label", datos.descripcion || "");
     medir();
     if (enVivo) leerPorDefecto(); // la lectura sigue al deslizador, sin esperar a la transición
@@ -1798,11 +1830,42 @@ function crearGraficoCrecimiento(canvas, datosIniciales) {
     return true;
   }
 
-  // Cambia de vista (600 ms). De barras a área, las barras se adelgazan y se desvanecen
-  // mientras aparecen las bandas bajo la misma curva; entre el diagrama de flujo de caja y el
-  // gráfico, uno se funde en el otro. Para ver la vista nueva dibujarse, "Repetir".
+  // Una vista se estrena si el gráfico está completo y quieto: no a medio construir, ni
+  // transformándose, ni en un paso de "Explícame".
+  function puedeEstrenar() {
+    const completo = estado.enfoque === "todo" && !estado.notas && estado.visibles >= modelo.total;
+    return construido && !pendiente && !saltarAnimacion && !transicion && completo && !movimientoReducido() && Boolean(lienzo?.width);
+  }
+
+  // Estrena una vista: se dibuja desde cero, con la misma construcción que al calcular,
+  // mientras la anterior se desvanece (DURACION_ESTRENO).
+  function estrenarVista(tipo) {
+    detenerPulso();
+    quitarGuia();
+    pintar(); // la foto, sin guía ni pulso
+    salida = fotografiar();
+    pesoFlujo = tipo === "flujo" ? 1 : 0;
+    if (tipo !== "flujo") mezclaArea = tipo === "area" ? 1 : 0;
+    alfaBurbuja = 0;
+    estado = { visibles: 0, enfoque: "todo", notas: null };
+    vista = calcularVista(estado, estado, 1);
+    leerPorDefecto();
+    arrancar();
+  }
+
+  // Cambia de vista. La primera vez que se ve con este cálculo, se estrena; después, el cambio
+  // dura 600 ms: de barras a área, las barras se adelgazan y se desvanecen mientras aparecen
+  // las bandas bajo la misma curva; entre el diagrama de flujo de caja y el gráfico, uno se
+  // funde en el otro.
   function cambiarTipo(tipo) {
     if (saltarCambioTipo) saltarCambioTipo();
+    const estrenar = !vistas.has(tipo) && puedeEstrenar();
+    tipoActual = tipo;
+    vistas.add(tipo);
+    if (estrenar) {
+      estrenarVista(tipo);
+      return;
+    }
     const flujoDestino = tipo === "flujo" ? 1 : 0;
     const areaDestino = tipo === "area" ? 1 : tipo === "barras" ? 0 : mezclaArea;
     if (flujoDestino === pesoFlujo && areaDestino === mezclaArea) return;
@@ -1893,6 +1956,7 @@ function crearGraficoCrecimiento(canvas, datosIniciales) {
 
   const observadorTamano = new ResizeObserver(() => {
     lienzo = prepararCanvas(canvas);
+    salida = null; // la foto quedó de otro tamaño
     if (lienzo.width === 0) return;
     medir();
     const mirado = guia.k === null ? null : objetivos().find((objetivo) => objetivo.k === guia.k);

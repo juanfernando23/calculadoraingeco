@@ -6,13 +6,17 @@ Proyecto de aula de Ingeniería Económica. Calculadora web pensada para el celu
 
 ## Qué hace
 
-- **Interés compuesto:** valor futuro, valor presente, tasa o tiempo (fórmulas 2.1 a 2.4), con la conversión de la tasa a la unidad del tiempo (1.1 a 1.6, 3.1 y 3.2).
-- **Gráfico animado** en tres vistas: diagrama de flujo de caja, barras y área.
-- **Explícame:** recorre el resultado paso a paso, también en voz alta.
-- **¿Y si…?:** mueve la tasa o el tiempo y mira cómo cambia el resultado (el efecto exponencial).
-- **Historial** de los últimos cálculos y **app instalable** que funciona sin internet.
+Los seis módulos de la hoja de clase, cada uno con la fórmula usada, el procedimiento con los números y un gráfico animado:
 
-Conversión de tasas, tasas indexadas y anualidades están en construcción.
+- **Interés compuesto:** valor futuro, valor presente, tasa o tiempo (2.1 a 2.4), con la tasa convertida a la unidad del tiempo.
+- **Conversión de tasas:** periódica, nominal o efectiva anual, vencida o anticipada, de cualquier forma a cualquier otra, pasando por la efectiva anual (1.1 a 1.6, 3.1 y 3.2), en una cadena paso a paso.
+- **Tasas indexadas:** DTF e IBR más puntos (suma, 4.2), IPC y UVR más puntos (combinada, 4.1), y la UVR en pesos.
+- **Anualidad vencida y anticipada:** P, F, cuota, número de pagos o tasa (5.1 a 6.3), con el diagrama de flujo de cada pago.
+- **Anualidad perpetua:** capital requerido (P = A / i) o pago sostenible (A = P · i), con la suma de pagos que converge.
+
+En todos: **Explícame** (paso a paso, también en voz alta), **¿Y si…?** (mueve un dato y mira el resultado cambiar en vivo), **historial** de cálculos y **app instalable** que funciona sin internet. Una tasa calculada se lleva a otro módulo con **Usar esta tasa**.
+
+**Validación:** en Acerca de → Validación están los cinco ejercicios del proyecto, resueltos a mano y con la calculadora, con su matriz de comprobación.
 
 ## Cómo usarla
 
