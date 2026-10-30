@@ -265,6 +265,8 @@
                     <label class="control__etiqueta" for="periodo-tasa" id="etiqueta-periodo">Periodo de la tasa</label>
                     <div class="selector">
                       <select id="periodo-tasa">
+                        <option value="52">Semanal</option>
+                        <option value="24">Quincenal</option>
                         <option value="12" selected>Mensual</option>
                         <option value="6">Bimestral</option>
                         <option value="4">Trimestral</option>
@@ -515,21 +517,7 @@
             <button class="enlace" type="button" data-accion="ejemplo">Cargar un ejemplo</button>
           </fieldset>
 
-          <div class="plegable" data-para="UVR">
-            <div class="plegable__interior">
-              <div class="campo">
-                <p class="campo__etiqueta" id="indexadas-etiqueta-operacion">¿Qué quieres calcular?</p>
-                <div class="segmentado segmentado--compacto" data-segmentado style="--opciones: 3" role="radiogroup" aria-labelledby="indexadas-etiqueta-operacion">
-                  <span class="segmentado__indicador" aria-hidden="true"></span>
-                  <label class="segmentado__opcion"><input type="radio" name="operacion" value="costo" checked>Costo en pesos</label>
-                  <label class="segmentado__opcion"><input type="radio" name="operacion" value="pesos">Pesos y UVR</label>
-                  <label class="segmentado__opcion"><input type="radio" name="operacion" value="variacion">Variación</label>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="plegable" data-para="DTF IBR IPC UVR-costo">
+          <div class="plegable" data-para="DTF IBR IPC UVR">
             <div class="plegable__interior">
               <div class="campo" data-campo="valor-indice">
                 <label class="campo__etiqueta" for="indexadas-indice" data-etiqueta-indice>DTF</label>
@@ -537,107 +525,13 @@
                   <input id="indexadas-indice" name="valor-indice" type="text" inputmode="decimal" enterkeyhint="next" placeholder="9,25">
                   <span class="entrada__adorno" aria-hidden="true">%</span>
                 </div>
+                <div data-tasa="indice"></div>
                 <p class="campo__error" aria-live="polite"></p>
               </div>
             </div>
           </div>
 
-          <div class="plegable" data-para="DTF">
-            <div class="plegable__interior">
-              <div class="campo">
-                <p class="control__etiqueta" id="indexadas-etiqueta-forma">¿En qué forma viene la DTF?</p>
-                <div class="segmentado segmentado--compacto" data-segmentado style="--opciones: 2" role="radiogroup" aria-labelledby="indexadas-etiqueta-forma">
-                  <span class="segmentado__indicador" aria-hidden="true"></span>
-                  <label class="segmentado__opcion"><input type="radio" name="forma-dtf" value="EA" checked>Efectiva anual</label>
-                  <label class="segmentado__opcion"><input type="radio" name="forma-dtf" value="TA">Trimestre anticipado</label>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="plegable" data-para="IBR">
-            <div class="plegable__interior">
-              <div class="campo">
-                <p class="control__etiqueta" id="indexadas-etiqueta-plazo">Plazo del IBR</p>
-                <div class="segmentado segmentado--compacto" data-segmentado style="--opciones: 2" role="radiogroup" aria-labelledby="indexadas-etiqueta-plazo">
-                  <span class="segmentado__indicador" aria-hidden="true"></span>
-                  <label class="segmentado__opcion"><input type="radio" name="plazo-ibr" value="12" checked>1 mes (mes vencido)</label>
-                  <label class="segmentado__opcion"><input type="radio" name="plazo-ibr" value="4">3 meses (trimestre vencido)</label>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="plegable" data-para="UVR-pesos">
-            <div class="plegable__interior">
-              <div class="campo">
-                <p class="control__etiqueta" id="indexadas-etiqueta-sentido">Convertir</p>
-                <div class="segmentado segmentado--compacto" data-segmentado style="--opciones: 2" role="radiogroup" aria-labelledby="indexadas-etiqueta-sentido">
-                  <span class="segmentado__indicador" aria-hidden="true"></span>
-                  <label class="segmentado__opcion"><input type="radio" name="sentido" value="a-pesos" checked>UVR a pesos</label>
-                  <label class="segmentado__opcion"><input type="radio" name="sentido" value="a-uvr">Pesos a UVR</label>
-                </div>
-              </div>
-              <div class="plegable" data-para="a-pesos">
-                <div class="plegable__interior">
-                  <div class="campo" data-campo="unidades">
-                    <label class="campo__etiqueta" for="indexadas-unidades">Cantidad de UVR</label>
-                    <div class="entrada">
-                      <input id="indexadas-unidades" name="unidades" type="text" inputmode="decimal" enterkeyhint="next" placeholder="50000">
-                      <span class="entrada__adorno" aria-hidden="true">UVR</span>
-                    </div>
-                    <p class="campo__leido" data-formato="uvr"></p>
-                    <p class="campo__error" aria-live="polite"></p>
-                  </div>
-                </div>
-              </div>
-              <div class="plegable" data-para="a-uvr">
-                <div class="plegable__interior">
-                  <div class="campo" data-campo="pesos">
-                    <label class="campo__etiqueta" for="indexadas-pesos">Valor en pesos</label>
-                    <div class="entrada">
-                      <span class="entrada__adorno" aria-hidden="true">$</span>
-                      <input id="indexadas-pesos" name="pesos" type="text" inputmode="decimal" enterkeyhint="next" placeholder="19000000">
-                    </div>
-                    <p class="campo__leido"></p>
-                    <p class="campo__error" aria-live="polite"></p>
-                  </div>
-                </div>
-              </div>
-              <div class="campo" data-campo="valor-uvr">
-                <label class="campo__etiqueta" for="indexadas-valor-uvr">Valor de la UVR ese día</label>
-                <div class="entrada">
-                  <span class="entrada__adorno" aria-hidden="true">$</span>
-                  <input id="indexadas-valor-uvr" name="valor-uvr" type="text" inputmode="decimal" enterkeyhint="done" placeholder="380">
-                </div>
-                <p class="campo__ayuda">Pesos por cada UVR. Lo publica el Banco de la República a diario.</p>
-                <p class="campo__error" aria-live="polite"></p>
-              </div>
-            </div>
-          </div>
-
-          <div class="plegable" data-para="UVR-variacion">
-            <div class="plegable__interior">
-              <div class="campo" data-campo="uvr-inicial">
-                <label class="campo__etiqueta" for="indexadas-uvr-inicial">UVR al inicio</label>
-                <div class="entrada">
-                  <span class="entrada__adorno" aria-hidden="true">$</span>
-                  <input id="indexadas-uvr-inicial" name="uvr-inicial" type="text" inputmode="decimal" enterkeyhint="next" placeholder="370">
-                </div>
-                <p class="campo__error" aria-live="polite"></p>
-              </div>
-              <div class="campo" data-campo="uvr-final">
-                <label class="campo__etiqueta" for="indexadas-uvr-final">UVR al final</label>
-                <div class="entrada">
-                  <span class="entrada__adorno" aria-hidden="true">$</span>
-                  <input id="indexadas-uvr-final" name="uvr-final" type="text" inputmode="decimal" enterkeyhint="done" placeholder="388,5">
-                </div>
-                <p class="campo__error" aria-live="polite"></p>
-              </div>
-            </div>
-          </div>
-
-          <div class="plegable" data-para="DTF IBR IPC UVR-costo">
+          <div class="plegable" data-para="DTF IBR IPC UVR">
             <div class="plegable__interior">
               <div class="campo" data-campo="puntos">
                 <label class="campo__etiqueta" for="indexadas-puntos">Puntos (spread)</label>
@@ -646,12 +540,15 @@
                   <span class="entrada__adorno" aria-hidden="true">%</span>
                 </div>
                 <p class="campo__ayuda" data-ayuda-puntos></p>
+                <div data-tasa="puntos"></div>
                 <p class="campo__error" aria-live="polite"></p>
               </div>
               <div class="campo">
                 <label class="campo__etiqueta" for="indexadas-convertir">Convertir también a</label>
                 <div class="selector">
                   <select id="indexadas-convertir" name="convertir">
+                    <option value="52">Periódica semanal</option>
+                    <option value="24">Periódica quincenal</option>
                     <option value="12" selected>Periódica mensual</option>
                     <option value="6">Periódica bimestral</option>
                     <option value="4">Periódica trimestral</option>
@@ -901,6 +798,8 @@
             <label class="control__etiqueta" data-para-selector>Periodo de la tasa</label>
             <div class="selector">
               <select data-nombre="periodo">
+                <option value="52">Semanal</option>
+                <option value="24">Quincenal</option>
                 <option value="12" selected>Mensual</option>
                 <option value="6">Bimestral</option>
                 <option value="4">Trimestral</option>
@@ -978,7 +877,7 @@
         <article class="tarjeta texto">
           <h2>Tasas indexadas</h2>
           <p><strong>DTF e IBR:</strong> el índice y los puntos se suman (4.2), pero solo si están en la misma forma; la app convierte antes si hace falta.</p>
-          <p><strong>IPC y UVR:</strong> el índice y los puntos se combinan (4.1): (1 + índice) · (1 + puntos) − 1. Con la UVR también puedes pasar de UVR a pesos y calcular su variación.</p>
+          <p><strong>IPC y UVR:</strong> el índice y los puntos se combinan (4.1): (1 + índice) · (1 + puntos) − 1. Con la UVR se usa su variación anual, como el IPC.</p>
           <p>Los valores de los índices los escribes tú: la app no los consulta en internet.</p>
         </article>
 

@@ -10,7 +10,7 @@ Los seis módulos de la hoja de clase, cada uno con la fórmula usada, el proced
 
 - **Interés compuesto:** valor futuro, valor presente, tasa o tiempo (2.1 a 2.4), con la tasa convertida a la unidad del tiempo.
 - **Conversión de tasas:** periódica, nominal o efectiva anual, vencida o anticipada, de cualquier forma a cualquier otra, pasando por la efectiva anual (1.1 a 1.6, 3.1 y 3.2), en una cadena paso a paso.
-- **Tasas indexadas:** DTF e IBR más puntos (suma, 4.2), IPC y UVR más puntos (combinada, 4.1), y la UVR en pesos.
+- **Tasas indexadas:** DTF e IBR más puntos (suma, 4.2), IPC y UVR más puntos (combinada, 4.1); el índice y los puntos, en cualquier forma.
 - **Anualidad vencida y anticipada:** P, F, cuota, número de pagos o tasa (5.1 a 6.3), con el diagrama de flujo de cada pago.
 - **Anualidad perpetua:** capital requerido (P = A / i) o pago sostenible (A = P · i), con la suma de pagos que converge.
 

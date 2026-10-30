@@ -43,7 +43,8 @@ function leerFormulario(form) {
 // Lo contrario: escribe los datos y avisa de los cambios, para que el formulario se acomode
 // (incógnita y opciones primero: deciden qué campos se ven).
 function escribirFormulario(form, datosGuardados) {
-  const datos = { ...datosGuardados };
+  // Un módulo puede traducir datos guardados con campos que ya no existen (form.adaptarDatos).
+  const datos = { ...(form.adaptarDatos ? form.adaptarDatos(datosGuardados) : datosGuardados) };
   // El tipo de cada tasa, como se ve en pantalla (también los guardados antes de los tres tipos).
   for (const lugar of form.querySelectorAll("[data-tasa]")) {
     const tipo = `${lugar.dataset.tasa}-tipo`;

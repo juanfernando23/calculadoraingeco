@@ -60,6 +60,8 @@ function leerNumero(texto) {
 // nombreTasa: la tasa efectiva de ese periodo, como la llama la hoja de clase: la de un periodo
 // menor que el año es la periódica (i_p); la del año, la efectiva anual (i_ea).
 const PERIODICIDADES = {
+  52: { singular: "semana", plural: "semanas", adjetivo: "semanal", nombreTasa: "periódica semanal", femenino: true },
+  24: { singular: "quincena", plural: "quincenas", adjetivo: "quincenal", nombreTasa: "periódica quincenal", femenino: true },
   12: { singular: "mes", plural: "meses", adjetivo: "mensual", nombreTasa: "periódica mensual" },
   6: { singular: "bimestre", plural: "bimestres", adjetivo: "bimestral", nombreTasa: "periódica bimestral" },
   4: { singular: "trimestre", plural: "trimestres", adjetivo: "trimestral", nombreTasa: "periódica trimestral" },
@@ -103,7 +105,8 @@ function describirTasa(tasa) {
   const p = PERIODICIDADES[tasa.m];
   const valor = porcentaje(tasa.valor);
   if (tasa.tipo === "nominal") {
-    return `${valor} nominal anual ${p.singular} ${tasa.modalidad === "anticipada" ? "anticipado" : "vencido"}`;
+    const sufijo = p.femenino ? "a" : "o"; // "mes vencido", "quincena vencida"
+    return `${valor} nominal anual ${p.singular} ${tasa.modalidad === "anticipada" ? "anticipad" : "vencid"}${sufijo}`;
   }
   return `${valor} ${p.nombreTasa}${tasa.modalidad === "anticipada" ? " anticipada" : ""}`;
 }
