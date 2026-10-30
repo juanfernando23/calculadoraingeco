@@ -326,8 +326,10 @@ main {
 /* Hacia adelante (inicio → módulo): la pantalla nueva entra desde la derecha. */
 html[data-direccion="adelante"]::view-transition-old(root) { animation-name: vt-salir-izquierda; animation-duration: 180ms; animation-timing-function: var(--ease-salir); }
 html[data-direccion="adelante"]::view-transition-new(root) { animation-name: vt-entrar-derecha; animation-delay: 60ms; animation-fill-mode: both; }
-html[data-direccion="atras"]::view-transition-old(root) { animation-name: vt-salir-derecha; animation-duration: 180ms; animation-timing-function: var(--ease-salir); }
-html[data-direccion="atras"]::view-transition-new(root) { animation-name: vt-entrar-izquierda; animation-delay: 60ms; animation-fill-mode: both; }
+/* Hacia atrás (módulo → inicio): la pantalla del módulo se va primero y después entra la otra,
+   sin que los textos de las dos se crucen. */
+html[data-direccion="atras"]::view-transition-old(root) { animation-name: vt-desvanecer; animation-duration: 140ms; animation-timing-function: var(--ease-salir); }
+html[data-direccion="atras"]::view-transition-new(root) { animation-name: vt-entrar-izquierda-suave; animation-delay: 140ms; animation-duration: 320ms; animation-fill-mode: both; }
 html[data-direccion="lado"]::view-transition-old(root) { animation-name: vt-desvanecer; animation-duration: 200ms; }
 html[data-direccion="lado"]::view-transition-new(root) { animation-name: vt-acercar; }
 
@@ -335,6 +337,7 @@ html[data-direccion="lado"]::view-transition-new(root) { animation-name: vt-acer
 @keyframes vt-salir-derecha { to { opacity: 0; transform: translateX(calc(48px * var(--mov))); } }
 @keyframes vt-entrar-derecha { from { opacity: 0; transform: translateX(calc(64px * var(--mov))); } }
 @keyframes vt-entrar-izquierda { from { opacity: 0; transform: translateX(calc(-64px * var(--mov))); } }
+@keyframes vt-entrar-izquierda-suave { from { opacity: 0; transform: translateX(calc(-20px * var(--mov))); } }
 @keyframes vt-desvanecer { to { opacity: 0; } }
 @keyframes vt-acercar { from { opacity: 0; transform: scale(calc(1 - 0.02 * var(--mov))); } }
 
@@ -345,6 +348,12 @@ html[data-direccion="lado"]::view-transition-new(root) { animation-name: vt-acer
 html[data-movimiento="reducido"] .vt-icono-compuesto,
 html[data-movimiento="reducido"] .vt-titulo-compuesto,
 html[data-movimiento="reducido"] .nav__fondo { view-transition-name: none !important; }
+
+/* Al volver al inicio no viajan el título ni el ícono (se cruzaban con la pantalla que entra):
+   el módulo se desvanece y después entra el inicio. */
+html[data-direccion="atras"] .vt-titulo-compuesto,
+html[data-direccion="atras"] .vt-icono-compuesto,
+html[data-direccion="atras"] .vt { view-transition-name: none !important; }
 
 /* Cambio de tema: revelado circular desde el botón (se anima desde app.js). */
 html.transicion-tema * { view-transition-name: none !important; }
