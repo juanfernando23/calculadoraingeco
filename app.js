@@ -2190,6 +2190,14 @@ function prepararAppInstalable() {
   window.addEventListener("offline", () => avisar("Sin conexión. La calculadora sigue funcionando."));
   $("instalar").addEventListener("click", instalar);
   $("instalar-desde-inicio").addEventListener("click", instalar);
+  $("descartar-iphone").addEventListener("click", () => {
+    try {
+      localStorage.setItem("aviso-iphone", "descartado");
+    } catch (e) {
+      /* sin almacenamiento */
+    }
+    $("aviso-iphone").hidden = true;
+  });
   $("descartar-instalar").addEventListener("click", () => {
     try {
       localStorage.setItem("aviso-instalar", "descartado");
@@ -2218,13 +2226,16 @@ function mostrarEstadoInstalacion() {
   else if (esIPhone()) estado.innerHTML = "En iPhone o iPad: toca <strong>Compartir</strong> y luego <strong>Agregar a inicio</strong>.";
   else estado.innerHTML = "Para instalarla, abre el menú del navegador y elige <strong>Instalar app</strong> o <strong>Agregar a la pantalla de inicio</strong>.";
   $("instalar").hidden = !invitacionInstalar;
-  let descartado = false;
-  try {
-    descartado = localStorage.getItem("aviso-instalar") === "descartado";
-  } catch (e) {
-    /* sin almacenamiento */
-  }
-  $("aviso-instalar").hidden = !invitacionInstalar || descartado || enModoApp();
+  const descartado = (clave) => {
+    try {
+      return localStorage.getItem(clave) === "descartado";
+    } catch (e) {
+      return false;
+    }
+  };
+  $("aviso-instalar").hidden = !invitacionInstalar || esIPhone() || descartado("aviso-instalar") || enModoApp();
+  // En iPhone no hay invitación para instalar: el aviso explica cómo agregarla a inicio.
+  $("aviso-iphone").hidden = !publicada || !esIPhone() || enModoApp() || descartado("aviso-iphone");
 }
 
 // ===================== Inicio =====================

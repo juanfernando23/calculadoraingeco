@@ -438,6 +438,10 @@ html.transicion-tema::view-transition-new(root) { animation: none; mix-blend-mod
 
 .aviso__acciones { display: flex; gap: 8px; }
 
+/* Pasos para instalar en iPhone */
+.pasos-iphone { display: grid; gap: 6px; margin: 0; padding-left: 20px; }
+.icono-en-linea { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 6px; background: var(--superficie); color: var(--primario); vertical-align: -6px; }
+
 .modulos {
   list-style: none;
   padding: 0;
